@@ -1,0 +1,21 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"1": "ivr:block/kcr_station_name_texture"
+	},
+	"elements": [
+		{
+			"from": [2, 0, 0],
+			"to": [14, 16, 0.5],
+			"faces": {
+				"north": {"uv": [5.5, 4, 8.5, 10], "texture": "#1", "tintindex": 0},
+				"east": {"uv": [5.5, 4, 8.5, 10], "texture": "#1", "tintindex": 0},
+				"south": {"uv": [5.5, 4, 8.5, 10], "texture": "#1", "tintindex": 0},
+				"west": {"uv": [5.5, 4, 8.5, 10], "texture": "#1", "tintindex": 0},
+				"up": {"uv": [5.5, 4, 8.5, 10], "texture": "#1", "tintindex": 0},
+				"down": {"uv": [5.5, 4, 8.5, 10], "texture": "#1", "tintindex": 0}
+			}
+		}
+	]
+}

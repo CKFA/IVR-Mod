@@ -1,0 +1,7 @@
+{
+	"variants": {
+		"": {
+			"model": "ivr:block/ivr_logo"
+		}
+	}
+}

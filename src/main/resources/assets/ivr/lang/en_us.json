@@ -1,0 +1,8 @@
+{
+  "gui.ivr.cycle_light": "Light: ",
+  "itemGroup.ivr.signs": "IVR-KCR Signs",
+  "block.ivr.classical_sign": "KCR Classical Sign(In East Rail)",
+  "block.ivr.classical_sign_pole": "KCR Classical Sign Pole(In East Rail)",
+  "block.ivr.modern_sign": "KCR Modern Sign(In West Rail and MOS Rail)",
+  "block.ivr.modern_sign_pole": "KCR Modern Sign Pole(In West Rail and MOS Rail)"
+}

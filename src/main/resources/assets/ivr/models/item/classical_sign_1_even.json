@@ -1,0 +1,6 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "ivr:item/classical_sign_1_even"
+	}
+}

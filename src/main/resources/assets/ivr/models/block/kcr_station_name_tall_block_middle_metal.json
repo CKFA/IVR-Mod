@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "ivr:block/metalic_02",
+		"particle": "ivr:block/metalic_02"
+	},
+	"elements": [
+		{
+			"from": [1.95, 0, 5.5],
+			"to": [14.05, 16, 10.5],
+			"faces": {
+				"north": {"uv": [5.5, 0, 10.5, 16], "texture": "#0"},
+				"east": {"uv": [5.5, 0, 10.5, 16], "texture": "#0"},
+				"south": {"uv": [5.5, 0, 10.5, 16], "texture": "#0"},
+				"west": {"uv": [5.5, 0, 10.5, 16], "texture": "#0"},
+				"up": {"uv": [5.5, 0, 10.5, 16], "texture": "#0"},
+				"down": {"uv": [5.5, 0, 10.5, 16], "texture": "#0"}
+			}
+		}
+	]
+}

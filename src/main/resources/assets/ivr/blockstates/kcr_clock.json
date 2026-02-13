@@ -1,0 +1,11 @@
+{
+	"variants": {
+		"facing=false": {
+			"model": "ivr:block/kcr_clock"
+		},
+		"facing=true": {
+			"model": "ivr:block/kcr_clock",
+			"y": 90
+		}
+	}
+}

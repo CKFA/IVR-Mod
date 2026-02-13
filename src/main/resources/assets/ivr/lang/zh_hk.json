@@ -1,0 +1,8 @@
+{
+  "itemGroup.ivr.signs": "IVR-九廣鐵路指示牌",
+  "block.ivr.classical_sign": "九廣鐵路指示牌(九廣東鐵專用)",
+  "block.ivr.classical_sign_pole": "九廣鐵路指示牌支柱(九廣東鐵專用)",
+  "block.ivr.modern_sign": "九廣鐵路指示牌(九廣西鐵+九廣馬鞍山鐵路專用)",
+  "block.ivr.modern_sign_pole": "九廣鐵路指示牌支柱(九廣西鐵+九廣馬鞍山鐵路專用)",
+  "gui.ivr.cycle_light": "光照: "
+}
