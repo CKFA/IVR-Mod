@@ -76,7 +76,7 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
             matricesNew.translate(0.5 + entity.getPos().getX(), 0.53125 + entity.getPos().getY(), 0.5 + entity.getPos().getZ());
             UtilitiesClient.rotateYDegrees(matricesNew, -facing.asRotation());
             UtilitiesClient.rotateZDegrees(matricesNew, 180);
-            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.25);
+            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.1875D);
         });
 
         matrices.push();
