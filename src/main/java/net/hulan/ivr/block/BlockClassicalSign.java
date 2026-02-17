@@ -124,7 +124,7 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
                 final VoxelShape poleL = IBlock.getVoxelShapeByDirection(6.25, 8, 7.5, 7.25, 16, 8.5, facing), poleR = IBlock.getVoxelShapeByDirection(8.75, 8, 7.5, 9.75, 16, 8.5, facing);
                 return VoxelShapes.union(main, poleL, poleR);
             } else {
-                main = IBlock.getVoxelShapeByDirection(xStart - 1.75, 0.25, 4, 16, 8.75, 12, facing);
+                main = IBlock.getVoxelShapeByDirection(xStart - 4.375, 0.25, 4, 16, 8.75, 12, facing);
                 pole = switch (length % 4) {
                     case 1 -> isOdd ? IBlock.getVoxelShapeByDirection(6.25, 8.75, 7.5, 7.25, 16, 8.5, facing) : IBlock.getVoxelShapeByDirection(14, 8.75, 7.5, 15, 16, 8.5, facing);
                     case 2 -> isOdd ? IBlock.getVoxelShapeByDirection(18.5, 8.75, 7.5, 19.5, 16, 8.5, facing) : IBlock.getVoxelShapeByDirection(9.25, 8.75, 7.5, 10.25, 16, 8.5, facing);
