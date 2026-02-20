@@ -8,6 +8,7 @@ import mtr.data.TransportMode;
 import mtr.mappings.UtilitiesClient;
 import mtr.packet.PacketTrainDataBase;
 import net.hulan.ivr.client.IVRClientData;
+import net.hulan.ivr.screen.ClassicalSign1OddScreen;
 import net.hulan.ivr.screen.ClassicalSignScreen;
 import net.hulan.ivr.screen.ModernSignScreen;
 import net.minecraft.client.MinecraftClient;
@@ -34,6 +35,15 @@ public class IVRPacketTrainDataGuiClient extends PacketTrainDataBase implements 
         });
     }
 
+    public static void openClassicalSign1OddScreenS2C(MinecraftClient minecraftClient, PacketByteBuf packet) {
+        final BlockPos pos = packet.readBlockPos();
+        minecraftClient.execute(() -> {
+            if (!(minecraftClient.currentScreen instanceof ClassicalSign1OddScreen)) {
+                UtilitiesClient.setScreen(minecraftClient, new ClassicalSign1OddScreen(pos));
+            }
+        });
+    }
+
     public static void openModernSignScreenS2C(MinecraftClient minecraftClient, PacketByteBuf packet) {
         final BlockPos pos = packet.readBlockPos();
         minecraftClient.execute(() -> {
@@ -54,6 +64,21 @@ public class IVRPacketTrainDataGuiClient extends PacketTrainDataBase implements 
         }
         packet.writeBoolean(luminance);
         RegistryClient.sendToServer(PACKET_CLASSICAL_SIGN_TYPES, packet);
+    }
+
+    public static void sendClassicalSign1OddIdsC2S(BlockPos signPos, Set<Long> selectedIds1, String[] signId1, Set<Long> selectedIds2, String[] signId2, boolean luminance) {
+        final PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+        packet.writeBlockPos(signPos);
+        packet.writeInt(selectedIds1.size());
+        selectedIds1.forEach(packet::writeLong);
+        packet.writeInt(1);
+        packet.writeString(signId1[0] == null ? "" : signId1[0]);
+        packet.writeInt(selectedIds2.size());
+        selectedIds2.forEach(packet::writeLong);
+        packet.writeInt(1);
+        packet.writeString(signId2[0] == null ? "" : signId2[0]);
+        packet.writeBoolean(luminance);
+        RegistryClient.sendToServer(PACKET_CLASSICAL_1ODD_SIGN_TYPES, packet);
     }
 
     public static void sendModernSignIdsC2S(BlockPos signPos, Set<Long> selectedIds, String[] signIds, boolean luminance) {

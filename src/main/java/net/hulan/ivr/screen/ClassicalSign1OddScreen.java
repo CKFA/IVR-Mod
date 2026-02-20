@@ -27,7 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ClassicalSignScreen extends ScreenMapper implements IGui {
+public class ClassicalSign1OddScreen extends ScreenMapper implements IGui {
 
     private int editingIndex;
     private int page;
@@ -37,10 +37,11 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
 
     private final BlockPos signPos;
     private final boolean isClassicalSign;
-    private final int length;
     private boolean luminance;
-    private final String[] signIds;
-    private final Set<Long> selectedIds;
+    private final String[] signId1;
+    private final Set<Long> selectedIds1;
+    private final String[] signId2;
+    private final Set<Long> selectedIds2;
     private final List<NameColorDataBase> exitsForList = new ArrayList<>();
     private final List<NameColorDataBase> platformsForList = new ArrayList<>();
     private final List<NameColorDataBase> routesForList = new ArrayList<>();
@@ -58,7 +59,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
     private static final int SIGN_BUTTON_SIZE = 16;
     private static final int BUTTON_Y_START = SIGN_SIZE + SQUARE_SIZE + SQUARE_SIZE / 2;
 
-    public ClassicalSignScreen(BlockPos signPos) {
+    public ClassicalSign1OddScreen(BlockPos signPos) {
         super(Text.literal(""));
         editingIndex = -1;
         this.signPos = signPos;
@@ -92,36 +93,35 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         if (world != null) {
             final BlockEntity entity = world.getBlockEntity(signPos);
-            if (entity instanceof BlockClassicalSign.TileEntityClassicalSign signEntity) {
-                signIds = signEntity.getSignIds();
-                selectedIds = signEntity.getSelectedIds();
+            if (entity instanceof BlockClassicalSign.TileEntityClassicalSign1Odd signEntity) {
+                signId1 = signEntity.getSignId1();
+                selectedIds1 = signEntity.getSelectedIds1();
+                signId2 = signEntity.getSignId2();
+                selectedIds2 = signEntity.getSelectedIds2();
                 isClassicalSign = true;
                 luminance = signEntity.luminance();
             } else {
-                signIds = new String[0];
-                selectedIds = new HashSet<>();
+                signId1 = null;
+                selectedIds1 = new HashSet<>();
+                signId2 = null;
+                selectedIds2 = new HashSet<>();
                 isClassicalSign = false;
                 if (entity instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
-                    selectedIds.add(((BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entity).getPlatformId());
+                    selectedIds1.add(((BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entity).getPlatformId());
                 }
             }
-            if (world.getBlockState(signPos).getBlock() instanceof BlockClassicalSign) {
-                length = ((BlockClassicalSign) world.getBlockState(signPos).getBlock()).length;
-            } else {
-                length = 0;
-            }
         } else {
-            length = 0;
-            signIds = new String[0];
-            selectedIds = new HashSet<>();
+            signId1 = null;
+            selectedIds1 = new HashSet<>();
+            signId2 = null;
+            selectedIds2 = new HashSet<>();
             isClassicalSign = false;
             luminance = false;
         }
 
-        buttonsEdit = new ButtonWidget[length];
+        buttonsEdit = new ButtonWidget[2];
         for (int i = 0; i < buttonsEdit.length; i++) {
             final int index = i;
             buttonsEdit[i] = UtilitiesClient.newButton(Text.translatable("selectWorld.edit"), button -> edit(index));
@@ -144,7 +144,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
         super.init();
 
         for (int i = 0; i < buttonsEdit.length; i++) {
-            IDrawing.setPositionAndWidth(buttonsEdit[i], (width - SIGN_SIZE * length) / 2 + i * SIGN_SIZE, SIGN_SIZE, SIGN_SIZE);
+            IDrawing.setPositionAndWidth(buttonsEdit[i], (width - SIGN_SIZE * 2) / 2 + i * SIGN_SIZE, SIGN_SIZE, SIGN_SIZE);
             addDrawableChild(buttonsEdit[i]);
         }
 
@@ -179,7 +179,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
         addDrawableChild(buttonNextPage);
 
         if (!isClassicalSign && client != null) {
-            UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this::close, platformsForList, selectedIds, true, false));
+            UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this::close, platformsForList, selectedIds1, true, false));
         }
     }
 
@@ -191,15 +191,14 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
             if (client == null) {
                 return;
             }
-
-            for (int i = 0; i < signIds.length; i++) {
-                if (signIds[i] != null) {
-                    RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signIds[i], (width - SIGN_SIZE * length) / 2F + i * SIGN_SIZE, 0, SIGN_SIZE, RenderClassicalSign.getMaxWidth(signIds, i, false), RenderClassicalSign.getMaxWidth(signIds, i, true), selectedIds, Direction.UP, 0, (textureId, x, y, size, flipTexture) -> {
-                        UtilitiesClient.beginDrawingTexture(textureId);
-                        drawTexture(matrices, (int) x, (int) y, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size);
-                    });
-                }
-            }
+            RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signId1[0], (width - SIGN_SIZE * 2) / 2F + 0, 0, SIGN_SIZE, 0, 0, selectedIds1, Direction.UP, 0, (textureId, x, y, size, flipTexture) -> {
+                UtilitiesClient.beginDrawingTexture(textureId);
+                drawTexture(matrices, (int) x, (int) y, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size);
+            });
+            RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signId2[0], (width - SIGN_SIZE * 2) / 2F + SIGN_SIZE, 0, SIGN_SIZE, 0, 0, selectedIds2, Direction.UP, 0, (textureId, x, y, size, flipTexture) -> {
+                UtilitiesClient.beginDrawingTexture(textureId);
+                drawTexture(matrices, (int) x, (int) y, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size);
+            });
 
             if (editingIndex >= 0) {
                 final int xOffsetSmall = (width - SIGN_BUTTON_SIZE * (columns * 4 + 3)) / 2 + SIGN_BUTTON_SIZE;
@@ -211,7 +210,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
                     if (sign != null) {
                         final boolean moveRight = sign.hasCustomText() && sign.flipCustomText;
                         UtilitiesClient.beginDrawingTexture(sign.textureId);
-                        RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signId, (isBig ? xOffsetBig : xOffsetSmall) + x + (moveRight ? SIGN_BUTTON_SIZE * 2 : 0), BUTTON_Y_START + y, SIGN_BUTTON_SIZE, 2, 2, selectedIds, Direction.UP, 0, (textureId, x1, y1, size, flipTexture) -> drawTexture(matrices, (int) x1, (int) y1, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size));
+                        RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signId, (isBig ? xOffsetBig : xOffsetSmall) + x + (moveRight ? SIGN_BUTTON_SIZE * 2 : 0), BUTTON_Y_START + y, SIGN_BUTTON_SIZE, 2, 2, editingIndex == 0 ? selectedIds1 : selectedIds2, Direction.UP, 0, (textureId, x1, y1, size, flipTexture) -> drawTexture(matrices, (int) x1, (int) y1, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size));
                     }
                 }, false);
 
@@ -230,7 +229,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
 
     @Override
     public void close() {
-        IVRPacketTrainDataGuiClient.sendClassicalSignIdsC2S(signPos, selectedIds, signIds, luminance);
+        IVRPacketTrainDataGuiClient.sendClassicalSign1OddIdsC2S(signPos, selectedIds1, signId1, selectedIds2, signId2, luminance);
         super.close();
     }
 
@@ -251,7 +250,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
         editingIndex = -1;
     }
 
-    private int loopSigns(LoopSignsCallback loopSignsCallback, boolean ignorePage) {
+    private int loopSigns(ClassicalSign1OddScreen.LoopSignsCallback loopSignsCallback, boolean ignorePage) {
         int pageCount = rows * columns;
         int indexSmall = 0;
         int indexBig = 0;
@@ -315,14 +314,23 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
     }
 
     private void setNewSignId(String newSignId) {
-        if (editingIndex >= 0 && editingIndex < signIds.length) {
-            signIds[editingIndex] = newSignId;
+        if (editingIndex == 0) {
+            signId1[0] = newSignId;
             final boolean isExitLetter = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.EXIT_LETTER.toString()) || newSignId.equals(BlockClassicalSign.SignType.EXIT_LETTER_FLIPPED.toString()));
             final boolean isPlatform = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.PLATFORM.toString()) || newSignId.equals(BlockClassicalSign.SignType.PLATFORM_FLIPPED.toString()));
             final boolean isLine = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.LINE.toString()) || newSignId.equals(BlockClassicalSign.SignType.LINE_FLIPPED.toString()));
             final boolean isStation = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.STATION.toString()) || newSignId.equals(BlockClassicalSign.SignType.STATION_FLIPPED.toString()));
             if ((isExitLetter || isPlatform || isLine || isStation) && client != null) {
-                UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this, isExitLetter ? exitsForList : isPlatform ? platformsForList : isLine ? routesForList : stationsForList, selectedIds, false, false));
+                UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this, isExitLetter ? exitsForList : isPlatform ? platformsForList : isLine ? routesForList : stationsForList, selectedIds1, false, false));
+            }
+        } else {
+            signId2[0] = newSignId;
+            final boolean isExitLetter = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.EXIT_LETTER.toString()) || newSignId.equals(BlockClassicalSign.SignType.EXIT_LETTER_FLIPPED.toString()));
+            final boolean isPlatform = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.PLATFORM.toString()) || newSignId.equals(BlockClassicalSign.SignType.PLATFORM_FLIPPED.toString()));
+            final boolean isLine = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.LINE.toString()) || newSignId.equals(BlockClassicalSign.SignType.LINE_FLIPPED.toString()));
+            final boolean isStation = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.STATION.toString()) || newSignId.equals(BlockClassicalSign.SignType.STATION_FLIPPED.toString()));
+            if ((isExitLetter || isPlatform || isLine || isStation) && client != null) {
+                UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this, isExitLetter ? exitsForList : isPlatform ? platformsForList : isLine ? routesForList : stationsForList, selectedIds1, false, false));
             }
         }
     }

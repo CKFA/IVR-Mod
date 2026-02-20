@@ -116,7 +116,6 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                         }));
             }
         }
-
         matrices.pop();
     }
 

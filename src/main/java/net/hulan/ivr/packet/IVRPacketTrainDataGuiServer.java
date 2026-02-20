@@ -2,7 +2,6 @@ package net.hulan.ivr.packet;
 
 import io.netty.buffer.Unpooled;
 import mtr.Registry;
-import mtr.block.BlockRouteSignBase;
 import mtr.data.*;
 import mtr.mappings.BlockEntityMapper;
 import mtr.packet.PacketTrainDataBase;
@@ -36,6 +35,12 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
         Registry.sendToPlayer(player, PACKET_OPEN_CLASSICAL_SIGN_SCREEN, packet);
     }
 
+    public static void openClassicalSign1OddScreenS2C(ServerPlayerEntity player, BlockPos signPos) {
+        final PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+        packet.writeBlockPos(signPos);
+        Registry.sendToPlayer(player, PACKET_OPEN_CLASSICAL_1ODD_SIGN_SCREEN, packet);
+    }
+
     public static void openModernSignScreenS2C(ServerPlayerEntity player, BlockPos signPos) {
         final PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
         packet.writeBlockPos(signPos);
@@ -60,14 +65,39 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
             final BlockEntity entity = player.world.getBlockEntity(signPos);
             if (entity instanceof BlockClassicalSign.TileEntityClassicalSign) {
                 setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setData(selectedIds, signIds, luminance), (BlockClassicalSign.TileEntityClassicalSign) entity);
-            } else if (entity instanceof BlockRouteSignBase.TileEntityRouteSignBase) {
+            } else if (entity instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
                 final long platformId = selectedIds.isEmpty() ? 0 : (long) selectedIds.toArray()[0];
                 final BlockEntity entityAbove = player.world.getBlockEntity(signPos.up());
-                if (entityAbove instanceof BlockRouteSignBase.TileEntityRouteSignBase) {
-                    setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setPlatformId(platformId), ((BlockRouteSignBase.TileEntityRouteSignBase) entityAbove), (BlockRouteSignBase.TileEntityRouteSignBase) entity);
+                if (entityAbove instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
+                    setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setPlatformId(platformId), ((BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entityAbove), (BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entity);
                 } else {
-                    setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setPlatformId(platformId), (BlockRouteSignBase.TileEntityRouteSignBase) entity);
+                    setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setPlatformId(platformId), (BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entity);
                 }
+            }
+        });
+    }
+
+    public static void receiveClassicalSign1OddIdsC2S(MinecraftServer minecraftServer, ServerPlayerEntity player, PacketByteBuf packet) {
+        final BlockPos signPos = packet.readBlockPos();
+        final int selectedIds1Length = packet.readInt();
+        final Set<Long> selectedIds1 = new HashSet<>();
+        for (int i = 0; i < selectedIds1Length; i++) {
+            selectedIds1.add(packet.readLong());
+        }
+        packet.readInt();
+        final String[] signId1 = new String[]{packet.readString(SerializedDataBase.PACKET_STRING_READ_LENGTH)};
+        final int selectedIds2Length = packet.readInt();
+        final Set<Long> selectedIds2 = new HashSet<>();
+        for (int i = 0; i < selectedIds2Length; i++) {
+            selectedIds2.add(packet.readLong());
+        }
+        packet.readInt();
+        final String[] signId2 = new String[]{packet.readString(SerializedDataBase.PACKET_STRING_READ_LENGTH)};
+        final boolean luminance = packet.readBoolean();
+        minecraftServer.execute(() -> {
+            final BlockEntity entity = player.world.getBlockEntity(signPos);
+            if (entity instanceof BlockClassicalSign.TileEntityClassicalSign1Odd) {
+                setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setData(selectedIds1, signId1, selectedIds2, signId2, luminance), (BlockClassicalSign.TileEntityClassicalSign1Odd) entity);
             }
         });
     }

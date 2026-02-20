@@ -57,7 +57,11 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
             if (hitSide == facing || hitSide == facing.getOpposite()) {
                 final BlockPos checkPos = findEndWithDirection(world, pos, hitSide.getOpposite(), false);
                 if (checkPos != null) {
-                    IVRPacketTrainDataGuiServer.openClassicalSignScreenS2C((ServerPlayerEntity) player, checkPos);
+                    if (this == IVRBlocks.CLASSICAL_SIGN_1_ODD.get()) {
+                        IVRPacketTrainDataGuiServer.openClassicalSign1OddScreenS2C((ServerPlayerEntity) player, checkPos);
+                    } else {
+                        IVRPacketTrainDataGuiServer.openClassicalSignScreenS2C((ServerPlayerEntity) player, checkPos);
+                    }
                 }
             }
         });
@@ -307,9 +311,9 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
     public static class TileEntityClassicalSign1Odd extends BlockEntityClientSerializableMapper {
 
         private final Set<Long> selectedIds1;
-        private String signId1;
+        private final String[] signId1;
         private final Set<Long> selectedIds2;
-        private String signId2;
+        private final String[] signId2;
         private boolean luminance;
         private static final String KEY_SELECTED_IDS1 = "selected_ids1";
         private static final String KEY_SIGN_LENGTH1 = "sign_length1";
@@ -318,7 +322,9 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
 
         public TileEntityClassicalSign1Odd(BlockPos pos, BlockState state) {
             super(IVRBlockEntityTypes.CLASSICAL_SIGN_1_ODD_TILE_ENTITY.get(), pos, state);
+            signId1 = new String[1];
             selectedIds1 = new HashSet<>();
+            signId2 = new String[1];
             selectedIds2 = new HashSet<>();
             luminance = false;
             markDirty();
@@ -329,21 +335,29 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
         public void readCompoundTag(NbtCompound compoundTag) {
             selectedIds1.clear();
             Arrays.stream(compoundTag.getLongArray(KEY_SELECTED_IDS1)).forEach(selectedIds1::add);
-            final String signId1 = compoundTag.getString(KEY_SIGN_LENGTH1);
-            this.signId1 = signId1.isEmpty() ? null : signId1;
+            for (int i = 0; i < signId1.length; i++) {
+                final String signId = compoundTag.getString(KEY_SIGN_LENGTH1 + i);
+                signId1[i] = signId.isEmpty() ? null : signId;
+            }
             selectedIds2.clear();
             Arrays.stream(compoundTag.getLongArray(KEY_SELECTED_IDS2)).forEach(selectedIds2::add);
-            final String signId2 = compoundTag.getString(KEY_SIGN_LENGTH2);
-            this.signId2 = signId2.isEmpty() ? null : signId2;
+            for (int i = 0; i < signId2.length; i++) {
+                final String signId = compoundTag.getString(KEY_SIGN_LENGTH2 + i);
+                signId2[i] = signId.isEmpty() ? null : signId;
+            }
             luminance = compoundTag.getBoolean("luminance");
         }
 
         @Override
         public void writeCompoundTag(NbtCompound compoundTag) {
             compoundTag.putLongArray(KEY_SELECTED_IDS1, new ArrayList<>(selectedIds1));
-            compoundTag.putString(KEY_SIGN_LENGTH1, signId1 == null ? "" : signId1);
+            for (int i = 0; i < signId1.length; i++) {
+                compoundTag.putString(KEY_SIGN_LENGTH1 + i, signId1[i] == null ? "" : signId1[i]);
+            }
             compoundTag.putLongArray(KEY_SELECTED_IDS2, new ArrayList<>(selectedIds2));
-            compoundTag.putString(KEY_SIGN_LENGTH2, signId2 == null ? "" : signId2);
+            for (int i = 0; i < signId2.length; i++) {
+                compoundTag.putString(KEY_SIGN_LENGTH2 + i, signId2[i] == null ? "" : signId2[i]);
+            }
             compoundTag.putBoolean("luminance", luminance);
         }
 
@@ -351,15 +365,19 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
             return new Box(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
         }
 
-        public void setData(Set<Long> selectedIds1, String signType1, Set<Long> selectedIds2, String signType2, boolean luminance) {
+        public void setData(Set<Long> selectedIds1, String[] signType1, Set<Long> selectedIds2, String[] signType2, boolean luminance) {
             this.selectedIds1.clear();
             this.selectedIds1.addAll(selectedIds1);
-            this.signId1 = signType1;
+            if (signId1.length == signType1.length) {
+                System.arraycopy(signType1, 0, signId1, 0, signType1.length);
+            }
             this.selectedIds2.clear();
             this.selectedIds2.addAll(selectedIds2);
-            this.signId2 = signType2;
+            if (signId2.length == signType2.length) {
+                System.arraycopy(signType2, 0, signId2, 0, signType2.length);
+            }
             this.luminance = luminance;
-            //light();
+            light();
             markDirty();
             syncData();
         }
@@ -372,16 +390,25 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
             return selectedIds2;
         }
 
-        public String getSignId1() {
+        public String[] getSignId1() {
             return signId1;
         }
 
-        public String getSignId2() {
+        public String[] getSignId2() {
             return signId2;
         }
 
         public boolean luminance() {
             return luminance;
+        }
+
+        public void light() {
+            BlockPos firstPos = getPos();
+            BlockState firstState = getCachedState();
+            if (world != null) {
+                world.setBlockState(firstPos, firstState.with(LIT, luminance), 3);
+                world.getLightingProvider().checkBlock(firstPos);
+            }
         }
     }
 

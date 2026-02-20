@@ -35,7 +35,7 @@ public class IVRClient implements ClientModInitializer, IVRPacket, IVRBlockEntit
         RegistryClient.registerBlockColors(KCR_STATION_COLOR_STATION_WALL.get());
         RegistryClient.registerBlockColors(KCR_STATION_COLOR_STATION_WALL_SLAB.get());
         RegistryClient.registerTileEntityRenderer(CLASSICAL_SIGN_1_EVEN_TILE_ENTITY.get(), RenderClassicalSign::new);
-        RegistryClient.registerTileEntityRenderer(CLASSICAL_SIGN_1_ODD_TILE_ENTITY.get(), RenderClassicalSign::new);
+        RegistryClient.registerTileEntityRenderer(CLASSICAL_SIGN_1_ODD_TILE_ENTITY.get(), RenderClassicalSign1Odd::new);
         RegistryClient.registerTileEntityRenderer(CLASSICAL_SIGN_2_EVEN_TILE_ENTITY.get(), RenderClassicalSign::new);
         RegistryClient.registerTileEntityRenderer(CLASSICAL_SIGN_2_ODD_TILE_ENTITY.get(), RenderClassicalSign::new);
         RegistryClient.registerTileEntityRenderer(CLASSICAL_SIGN_3_EVEN_TILE_ENTITY.get(), RenderClassicalSign::new);
@@ -76,8 +76,9 @@ public class IVRClient implements ClientModInitializer, IVRPacket, IVRBlockEntit
         RegistryClient.registerTileEntityRenderer(KCR_STATION_NAME_WALL_GRAY_TILE_ENTITY.get(), (dispatcher) -> new RenderKCRStationNameTiled<>(dispatcher, false));
         RegistryClient.registerTileEntityRenderer(KCR_STATION_NAME_WALL_BLACK_TILE_ENTITY.get(), (dispatcher) -> new RenderKCRStationNameTiled<>(dispatcher, false));
         RegistryClient.registerTileEntityRenderer(MODERN_ROUTE_SIGN_TILE_ENTITY.get(), RenderModernRouteSign::new);
-        RegistryClient.registerNetworkReceiver(PACKET_OPEN_MODERN_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openModernSignScreenS2C(MinecraftClient.getInstance(), packet));
         RegistryClient.registerNetworkReceiver(PACKET_OPEN_CLASSICAL_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openClassicalSignScreenS2C(MinecraftClient.getInstance(), packet));
+        RegistryClient.registerNetworkReceiver(PACKET_OPEN_CLASSICAL_1ODD_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openClassicalSign1OddScreenS2C(MinecraftClient.getInstance(), packet));
+        RegistryClient.registerNetworkReceiver(PACKET_OPEN_MODERN_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openModernSignScreenS2C(MinecraftClient.getInstance(), packet));
         RegistryClient.registerNetworkReceiver(PACKET_IVR_CHUNK_S2C, (packet) -> IVRPacketTrainDataGuiClient.receiveChunk(MinecraftClient.getInstance(), packet));
         RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_STATION, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(MinecraftClient.getInstance(), packet, ClientData.STATIONS, ClientData.DATA_CACHE.stationIdMap, (id, transportMode) -> new Station(id), false));
         RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_PLATFORM, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(MinecraftClient.getInstance(), packet, ClientData.PLATFORMS, ClientData.DATA_CACHE.platformIdMap, null, false));
