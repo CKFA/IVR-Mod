@@ -4,9 +4,11 @@ import com.mojang.logging.LogUtils;
 import mtr.CreativeModeTabs;
 import mtr.MTR;
 import mtr.RegistryObject;
+import mtr.block.BlockTicketBarrier;
 import mtr.data.Depot;
 import mtr.data.Route;
 import mtr.data.Station;
+import mtr.data.TicketSystem;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.BlockEntityMapper;
@@ -183,7 +185,6 @@ public class IVR implements ModInitializer, IVRPacket, IVRBlocks, IVRBlockEntity
         } else if (itemObject instanceof ItemWithCreativeTabBase.ItemPlaceOnWater) {
             FabricRegistryUtilities.registerCreativeModeTab(((ItemWithCreativeTabBase.ItemPlaceOnWater)itemObject).creativeModeTab.get(), itemObject);
         }
-
     }
 
     private static void registerBlock(String path, RegistryObject<Block> block) {
