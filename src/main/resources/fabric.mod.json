@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "ivr",
-  "version": "${version}",
+  "version": "1.0",
   "name": "IVR",
   "description": "",
   "authors": ["Unkownkfa-Textures", "FrostyHulan-Coding"],
@@ -23,8 +23,7 @@
   "depends": {
     "fabricloader": ">=0.15.7",
     "fabric": "*",
-    "minecraft": ">=1.18.2",
-    "mtr": "<=3.2",
-    "nte": "*"
+    "minecraft": "1.18.2",
+    "mtr": "*"
   }
 }

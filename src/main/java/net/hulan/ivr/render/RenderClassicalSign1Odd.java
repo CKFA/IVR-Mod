@@ -81,7 +81,7 @@ public class RenderClassicalSign1Odd<T extends BlockClassicalSign.TileEntityClas
             matricesNew.translate(0.5 + entity.getPos().getX(), 0.53125 + entity.getPos().getY(), 0.5 + entity.getPos().getZ());
             UtilitiesClient.rotateYDegrees(matricesNew, -facing.asRotation());
             UtilitiesClient.rotateZDegrees(matricesNew, 180);
-            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.1875D);
+            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.125D);
         });
 
         matrices.push();
@@ -162,7 +162,7 @@ public class RenderClassicalSign1Odd<T extends BlockClassicalSign.TileEntityClas
             matricesNew.translate(0.5 + entity.getPos().getX(), 0.53125 + entity.getPos().getY(), 0.5 + entity.getPos().getZ());
             UtilitiesClient.rotateYDegrees(matricesNew, -facing.asRotation());
             UtilitiesClient.rotateZDegrees(matricesNew, 180);
-            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.1875D);
+            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.125D);
         });
 
         matrices.push();
