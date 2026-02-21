@@ -119,16 +119,16 @@ public class BlockClassicalSign extends BlockDirectionalMapper implements Entity
     public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
         final Direction facing = IBlock.getStatePropertySafe(state, FACING);
         if (state.isOf(IVRBlocks.CLASSICAL_SIGN_MIDDLE.get())) {
-            return IBlock.getVoxelShapeByDirection(0, 0.25, 4, 16, 8.75, 12, facing);
+            return IBlock.getVoxelShapeByDirection(0, 0.25, 5, 16, 8.75, 11, facing);
         } else {
             final int xStart = getXStart();
             final VoxelShape main, pole;
             if (equals(IVRBlocks.CLASSICAL_SIGN_1_ODD.get())) {
-                main = IBlock.getVoxelShapeByDirection(2.25, 0.25, 4, 13.75, 8.75, 12, facing);
+                main = IBlock.getVoxelShapeByDirection(2.25, 0.25, 5, 13.75, 8.75, 11, facing);
                 final VoxelShape poleL = IBlock.getVoxelShapeByDirection(6.25, 8, 7.5, 7.25, 16, 8.5, facing), poleR = IBlock.getVoxelShapeByDirection(8.75, 8, 7.5, 9.75, 16, 8.5, facing);
                 return VoxelShapes.union(main, poleL, poleR);
             } else {
-                main = IBlock.getVoxelShapeByDirection(xStart - 4.375, 0.25, 4, 16, 8.75, 12, facing);
+                main = IBlock.getVoxelShapeByDirection(xStart - 4.375, 0.25, 5, 16, 8.75, 11, facing);
                 pole = switch (length % 4) {
                     case 1 -> isOdd ? IBlock.getVoxelShapeByDirection(6.25, 8.75, 7.5, 7.25, 16, 8.5, facing) : IBlock.getVoxelShapeByDirection(14, 8.75, 7.5, 15, 16, 8.5, facing);
                     case 2 -> isOdd ? IBlock.getVoxelShapeByDirection(18.5, 8.75, 7.5, 19.5, 16, 8.5, facing) : IBlock.getVoxelShapeByDirection(9.25, 8.75, 7.5, 10.25, 16, 8.5, facing);

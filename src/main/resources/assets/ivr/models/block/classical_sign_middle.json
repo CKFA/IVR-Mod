@@ -4,14 +4,14 @@
 	"parent": "block/block",
 	"textures": {
 		"2": "ivr:block/classical/blue",
-		"particle": "ivr:block/classical/blue",
+		"particle": "ivr:block/classical/side_frame",
 		"bottom_frame": "ivr:block/classical/bottom_frame",
 		"above_frame": "ivr:block/classical/above_frame"
 	},
 	"elements": [
 		{
-			"from": [0, 0.5, 4],
-			"to": [16, 8.5, 12],
+			"from": [0, 0.5, 5],
+			"to": [16, 8.5, 11],
 			"faces": {
 				"north": {"uv": [0, 0, 16, 8], "texture": "#2"},
 				"east": {"uv": [0, 0, 0.5, 8], "texture": "#2"},
@@ -23,8 +23,8 @@
 		},
 		{
 			"name": "above_frame",
-			"from": [-0.025, 8.5, 4],
-			"to": [16, 8.75, 12],
+			"from": [-0.025, 8.5, 5],
+			"to": [16, 8.75, 11],
 			"faces": {
 				"north": {"uv": [0, 0, 8, 8], "texture": "#above_frame"},
 				"east": {"uv": [0, 0, 0.5, 8], "texture": "#above_frame"},
@@ -36,8 +36,8 @@
 		},
 		{
 			"name": "bottom_frame",
-			"from": [-0.025, 0.25, 4],
-			"to": [16, 0.5, 12],
+			"from": [-0.025, 0.25, 5],
+			"to": [16, 0.5, 11],
 			"faces": {
 				"north": {"uv": [7.83674, 0, 11.91837, 16], "texture": "#bottom_frame"},
 				"east": {"uv": [0, 0, 0.5, 8], "texture": "#bottom_frame"},
