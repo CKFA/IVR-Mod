@@ -1,17 +1,21 @@
 package net.hulan.ivr.block;
 
 import mtr.block.IBlock;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class BlockKCRStationNameWallBase extends BlockKCRStationNameBase implements IBlock {
 
@@ -21,37 +25,37 @@ public abstract class BlockKCRStationNameWallBase extends BlockKCRStationNameBas
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
         Direction facing = IBlock.getStatePropertySafe(state, FACING);
-        return world.getBlockState(pos.offset(facing)).isSideSolidFullSquare(world, pos.offset(facing), facing.getOpposite());
+        return world.getBlockState(pos.relative(facing)).isFaceSturdy(world, pos.relative(facing), facing.getOpposite());
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction side = ctx.getSide();
-        return side != Direction.UP && side != Direction.DOWN ? this.getDefaultState().with(FACING, side.getOpposite()) : null;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
-        return direction.getOpposite() == IBlock.getStatePropertySafe(state, FACING).getOpposite() && !state.canPlaceAt(world, pos) ? Blocks.AIR.getDefaultState() : state;
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        Direction side = ctx.getClickedFace();
+        return side != Direction.UP && side != Direction.DOWN ? defaultBlockState().setValue(FACING, side.getOpposite()) : null;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
-        return IBlock.getVoxelShapeByDirection(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 1.0D, IBlock.getStatePropertySafe(state, FACING));
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState newState, LevelAccessor world, BlockPos pos, BlockPos posFrom) {
+        return direction.getOpposite() == IBlock.getStatePropertySafe(state, FACING).getOpposite() && !state.canSurvive(world, pos) ? Blocks.AIR.defaultBlockState() : state;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getCollisionShape(BlockState blockState, BlockView blockGetter, BlockPos blockPos, ShapeContext collisionContext) {
-        return VoxelShapes.empty();
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
+        return IBlock.getVoxelShapeByDirection(0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 1.0F, IBlock.getStatePropertySafe(state, FACING));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @NotNull VoxelShape getCollisionShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+        return Shapes.empty();
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 

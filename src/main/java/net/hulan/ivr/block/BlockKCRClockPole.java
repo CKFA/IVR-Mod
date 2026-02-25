@@ -1,20 +1,24 @@
 package net.hulan.ivr.block;
 
 import mtr.mappings.BlockMapper;
-import net.minecraft.block.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockKCRClockPole extends BlockMapper {
 
     public BlockKCRClockPole() {
-        super(Settings.of(Material.METAL).requiresTool().strength(1.0F));
+        super(Properties.of(Material.METAL).requiresCorrectToolForDrops().strength(1.0F));
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
-        return Block.createCuboidShape(7.5D, 0.0D, 7.5D, 8.5D, 16.0D, 8.5D);
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
+        return Block.box(7.5D, 0.0D, 7.5D, 8.5D, 16.0D, 8.5D);
     }
 }

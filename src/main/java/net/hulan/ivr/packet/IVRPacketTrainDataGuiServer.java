@@ -11,14 +11,14 @@ import mtr.packet.UpdateSquaremap;
 import net.hulan.ivr.block.BlockClassicalSign;
 import net.hulan.ivr.block.BlockKCRRouteSignBase;
 import net.hulan.ivr.block.BlockModernSign;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -29,25 +29,25 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
 
     private static final int PACKET_CHUNK_SIZE = (int)Math.pow(2.0D, 14.0D);
 
-    public static void openClassicalSignScreenS2C(ServerPlayerEntity player, BlockPos signPos) {
-        final PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+    public static void openClassicalSignScreenS2C(ServerPlayer player, BlockPos signPos) {
+        final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
         packet.writeBlockPos(signPos);
         Registry.sendToPlayer(player, PACKET_OPEN_CLASSICAL_SIGN_SCREEN, packet);
     }
 
-    public static void openClassicalSign1OddScreenS2C(ServerPlayerEntity player, BlockPos signPos) {
-        final PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+    public static void openClassicalSign1OddScreenS2C(ServerPlayer player, BlockPos signPos) {
+        final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
         packet.writeBlockPos(signPos);
         Registry.sendToPlayer(player, PACKET_OPEN_CLASSICAL_1ODD_SIGN_SCREEN, packet);
     }
 
-    public static void openModernSignScreenS2C(ServerPlayerEntity player, BlockPos signPos) {
-        final PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+    public static void openModernSignScreenS2C(ServerPlayer player, BlockPos signPos) {
+        final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
         packet.writeBlockPos(signPos);
         Registry.sendToPlayer(player, IVRPacket.PACKET_OPEN_MODERN_SIGN_SCREEN, packet);
     }
 
-    public static void receiveClassicalSignIdsC2S(MinecraftServer minecraftServer, ServerPlayerEntity player, PacketByteBuf packet) {
+    public static void receiveClassicalSignIdsC2S(MinecraftServer minecraftServer, ServerPlayer player, FriendlyByteBuf packet) {
         final BlockPos signPos = packet.readBlockPos();
         final int selectedIdsLength = packet.readInt();
         final Set<Long> selectedIds = new HashSet<>();
@@ -57,17 +57,17 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
         final int signLength = packet.readInt();
         final String[] signIds = new String[signLength];
         for (int i = 0; i < signLength; i++) {
-            final String signId = packet.readString(SerializedDataBase.PACKET_STRING_READ_LENGTH);
+            final String signId = packet.readUtf(SerializedDataBase.PACKET_STRING_READ_LENGTH);
             signIds[i] = signId.isEmpty() ? null : signId;
         }
         final boolean luminance = packet.readBoolean();
         minecraftServer.execute(() -> {
-            final BlockEntity entity = player.world.getBlockEntity(signPos);
+            final BlockEntity entity = player.level.getBlockEntity(signPos);
             if (entity instanceof BlockClassicalSign.TileEntityClassicalSign) {
                 setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setData(selectedIds, signIds, luminance), (BlockClassicalSign.TileEntityClassicalSign) entity);
             } else if (entity instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
                 final long platformId = selectedIds.isEmpty() ? 0 : (long) selectedIds.toArray()[0];
-                final BlockEntity entityAbove = player.world.getBlockEntity(signPos.up());
+                final BlockEntity entityAbove = player.level.getBlockEntity(signPos.above());
                 if (entityAbove instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
                     setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setPlatformId(platformId), ((BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entityAbove), (BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) entity);
                 } else {
@@ -77,7 +77,7 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
         });
     }
 
-    public static void receiveClassicalSign1OddIdsC2S(MinecraftServer minecraftServer, ServerPlayerEntity player, PacketByteBuf packet) {
+    public static void receiveClassicalSign1OddIdsC2S(MinecraftServer minecraftServer, ServerPlayer player, FriendlyByteBuf packet) {
         final BlockPos signPos = packet.readBlockPos();
         final int selectedIds1Length = packet.readInt();
         final Set<Long> selectedIds1 = new HashSet<>();
@@ -85,24 +85,24 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
             selectedIds1.add(packet.readLong());
         }
         packet.readInt();
-        final String[] signId1 = new String[]{packet.readString(SerializedDataBase.PACKET_STRING_READ_LENGTH)};
+        final String[] signId1 = new String[]{packet.readUtf(SerializedDataBase.PACKET_STRING_READ_LENGTH)};
         final int selectedIds2Length = packet.readInt();
         final Set<Long> selectedIds2 = new HashSet<>();
         for (int i = 0; i < selectedIds2Length; i++) {
             selectedIds2.add(packet.readLong());
         }
         packet.readInt();
-        final String[] signId2 = new String[]{packet.readString(SerializedDataBase.PACKET_STRING_READ_LENGTH)};
+        final String[] signId2 = new String[]{packet.readUtf(SerializedDataBase.PACKET_STRING_READ_LENGTH)};
         final boolean luminance = packet.readBoolean();
         minecraftServer.execute(() -> {
-            final BlockEntity entity = player.world.getBlockEntity(signPos);
+            final BlockEntity entity = player.level.getBlockEntity(signPos);
             if (entity instanceof BlockClassicalSign.TileEntityClassicalSign1Odd) {
                 setTileEntityDataAndWriteUpdate(player, entity2 -> entity2.setData(selectedIds1, signId1, selectedIds2, signId2, luminance), (BlockClassicalSign.TileEntityClassicalSign1Odd) entity);
             }
         });
     }
 
-    public static void receiveModernSignIdsC2S(MinecraftServer minecraftServer, ServerPlayerEntity player, PacketByteBuf packet) {
+    public static void receiveModernSignIdsC2S(MinecraftServer minecraftServer, ServerPlayer player, FriendlyByteBuf packet) {
         BlockPos signPos = packet.readBlockPos();
         int selectedIdsLength = packet.readInt();
         Set<Long> selectedIds = new HashSet<>();
@@ -113,17 +113,17 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
         signLength = packet.readInt();
         String[] signIds = new String[signLength];
         for(int i = 0; i < signLength; ++i) {
-            String signId = packet.readString(32767);
+            String signId = packet.readUtf(32767);
             signIds[i] = signId.isEmpty() ? null : signId;
         }
         final boolean luminance = packet.readBoolean();
         minecraftServer.execute(() -> {
-            BlockEntity entity = player.world.getBlockEntity(signPos);
+            BlockEntity entity = player.level.getBlockEntity(signPos);
             if (entity instanceof BlockModernSign.TileEntityModernSign) {
                 setTileEntityDataAndWriteUpdate(player, (entity2) -> entity2.setData(selectedIds, signIds, luminance), (BlockModernSign.TileEntityModernSign)entity);
             } else if (entity instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
                 long platformId = selectedIds.isEmpty() ? 0L : (Long)selectedIds.toArray()[0];
-                BlockEntity entityAbove = player.world.getBlockEntity(signPos.up());
+                BlockEntity entityAbove = player.level.getBlockEntity(signPos.above());
                 if (entityAbove instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
                     setTileEntityDataAndWriteUpdate(player, (entity2) -> entity2.setPlatformId(platformId), (BlockKCRRouteSignBase.TileEntityKCRRouteSignBase)entityAbove, (BlockKCRRouteSignBase.TileEntityKCRRouteSignBase)entity);
                 } else {
@@ -134,30 +134,30 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
     }
 
     @SafeVarargs
-    private static <T extends BlockEntityMapper> void setTileEntityDataAndWriteUpdate(ServerPlayerEntity player, Consumer<T> setData, T... entities) {
-        final RailwayData railwayData = RailwayData.getInstance(player.world);
+    private static <T extends BlockEntityMapper> void setTileEntityDataAndWriteUpdate(ServerPlayer player, Consumer<T> setData, T... entities) {
+        final RailwayData railwayData = RailwayData.getInstance(player.level);
         if (railwayData != null && entities.length > 0) {
-            final NbtCompound compoundTagOld = new NbtCompound();
+            final CompoundTag compoundTagOld = new CompoundTag();
             entities[0].writeCompoundTag(compoundTagOld);
             BlockPos blockPos = null;
             long posLong = 0;
             for (final T entity : entities) {
                 setData.accept(entity);
-                final BlockPos entityPos = entity.getPos();
+                final BlockPos entityPos = entity.getBlockPos();
                 if (blockPos == null || entityPos.asLong() > posLong) {
                     blockPos = entityPos;
                     posLong = entityPos.asLong();
                 }
             }
-            final NbtCompound compoundTagNew = new NbtCompound();
+            final CompoundTag compoundTagNew = new CompoundTag();
             entities[0].writeCompoundTag(compoundTagNew);
             railwayData.railwayDataLoggingModule.addEvent(player, entities[0].getClass(), RailwayDataLoggingModule.getData(compoundTagOld), RailwayDataLoggingModule.getData(compoundTagNew), blockPos);
         }
     }
 
-    public static void sendAllInChunks(ServerPlayerEntity player, Set<Station> stations, Set<Platform> platforms, Set<Siding> sidings, Set<Route> routes, Set<Depot> depots, Set<LiftServer> lifts) {
+    public static void sendAllInChunks(ServerPlayer player, Set<Station> stations, Set<Platform> platforms, Set<Siding> sidings, Set<Route> routes, Set<Depot> depots, Set<LiftServer> lifts) {
         long tempPacketId = new Random().nextLong();
-        PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+        FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
         serializeData(packet, stations);
         serializeData(packet, platforms);
         serializeData(packet, sidings);
@@ -170,13 +170,13 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
         }
     }
 
-    private static <T extends SerializedDataBase> void serializeData(PacketByteBuf packet, Collection<T> objects) {
+    private static <T extends SerializedDataBase> void serializeData(FriendlyByteBuf packet, Collection<T> objects) {
         packet.writeInt(objects.size());
         objects.forEach((object) -> object.writePacket(packet));
     }
 
-    private static boolean sendChunk(ServerPlayerEntity player, PacketByteBuf packet, long tempPacketId, int chunk) {
-        PacketByteBuf packetChunk = new PacketByteBuf(Unpooled.buffer());
+    private static boolean sendChunk(ServerPlayer player, FriendlyByteBuf packet, long tempPacketId, int chunk) {
+        FriendlyByteBuf packetChunk = new FriendlyByteBuf(Unpooled.buffer());
         packetChunk.writeLong(tempPacketId);
         packetChunk.writeInt(chunk);
         boolean success = chunk * PACKET_CHUNK_SIZE > packet.readableBytes();
@@ -192,30 +192,28 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
         return success;
     }
 
-    public static <T extends NameColorDataBase> void receiveUpdateOrDeleteC2S(MinecraftServer minecraftServer, ServerPlayerEntity player, PacketByteBuf packet, Identifier packetId, Function<RailwayData, Set<T>> dataSet, Function<RailwayData, Map<Long, T>> cacheMap, BiFunction<Long, TransportMode, T> createDataWithId, boolean isDelete) {
+    public static <T extends NameColorDataBase> void receiveUpdateOrDeleteC2S(MinecraftServer minecraftServer, ServerPlayer player, FriendlyByteBuf packet, ResourceLocation packetId, Function<RailwayData, Set<T>> dataSet, Function<RailwayData, Map<Long, T>> cacheMap, BiFunction<Long, TransportMode, T> createDataWithId, boolean isDelete) {
         if (!RailwayData.hasNoPermission(player)) {
-            World world = player.world;
-            RailwayData railwayData = RailwayData.getInstance(world);
+            Level level = player.level;
+            RailwayData railwayData = RailwayData.getInstance(level);
             if (railwayData != null) {
                 PacketCallback packetCallback = (updatePacket, fullPacket) -> {
-                    world.getPlayers().forEach((worldPlayer) -> {
-                        if (!worldPlayer.getUuid().equals(player.getUuid())) {
-                            Registry.sendToPlayer((ServerPlayerEntity)worldPlayer, packetId, fullPacket);
+                    level.players().forEach((levelPlayer) -> {
+                        if (!levelPlayer.getUUID().equals(player.getUUID())) {
+                            Registry.sendToPlayer((ServerPlayer)levelPlayer, packetId, fullPacket);
                         }
                     });
                     if (packetId.equals(PACKET_IVR_UPDATE_STATION) || packetId.equals(PACKET_IVR_DELETE_STATION) || packetId.equals(PACKET_IVR_UPDATE_DEPOT) || packetId.equals(PACKET_IVR_DELETE_DEPOT)) {
                         try {
-                            UpdateDynmap.updateDynmap(world, railwayData);
+                            UpdateDynmap.updateDynmap(level, railwayData);
                         } catch (Exception | NoClassDefFoundError ignored) {
                         }
-
                         try {
-                            UpdateBlueMap.updateBlueMap(world, railwayData);
+                            UpdateBlueMap.updateBlueMap(level, railwayData);
                         } catch (Exception | NoClassDefFoundError ignored) {
                         }
-
                         try {
-                            UpdateSquaremap.updateSquaremap(world, railwayData);
+                            UpdateSquaremap.updateSquaremap(level, railwayData);
                         } catch (Exception | NoClassDefFoundError ignored) {
                         }
                     }
@@ -246,7 +244,6 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
                                     oldData,
                                     RailwayDataLoggingModule.getData(data)));
                 }
-
             }
         }
     }

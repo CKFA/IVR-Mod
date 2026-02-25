@@ -1,5 +1,6 @@
 package net.hulan.ivr.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.block.IBlock;
 import mtr.client.ClientData;
 import mtr.client.IDrawing;
@@ -10,18 +11,17 @@ import mtr.render.RenderTrains;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockKCRPSDTop;
 import net.hulan.ivr.client.IVRClientData;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCRRouteBase> extends BlockEntityRendererMapper<T> implements IGui, IBlock {
 
@@ -43,16 +43,16 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
     }
 
     @Override
-    public final void render(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        World world = entity.getWorld();
+    public final void render(T entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        Level world = entity.getLevel();
         if (world != null) {
-            BlockPos pos = entity.getPos();
+            BlockPos pos = entity.getBlockPos();
             BlockState state = world.getBlockState(pos);
-            Direction facing = IBlock.getStatePropertySafe(state, HorizontalFacingBlock.FACING);
+            Direction facing = IBlock.getStatePropertySafe(state, HorizontalDirectionalBlock.FACING);
             StoredMatrixTransformations storedMatrixTransformations = new StoredMatrixTransformations();
             storedMatrixTransformations.add((matricesNew) -> {
-                matricesNew.translate(0.5D + (double)entity.getPos().getX(), entity.getPos().getY(), 0.5D + (double)entity.getPos().getZ());
-                UtilitiesClient.rotateYDegrees(matricesNew, -facing.asRotation());
+                matricesNew.translate(0.5D + (double)entity.getBlockPos().getX(), entity.getBlockPos().getY(), 0.5D + (double)entity.getBlockPos().getZ());
+                UtilitiesClient.rotateYDegrees(matricesNew, -facing.toYRot());
             });
             this.renderAdditionalUnmodified(storedMatrixTransformations.copy(), state, facing, light);
             if (!RenderTrains.shouldNotRender(pos, RenderTrains.maxTrainRenderDistance, null)) {
@@ -66,12 +66,12 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
                     int leftBlocks = this.getTextureNumber(world, pos, facing, true);
                     int rightBlocks = this.getTextureNumber(world, pos, facing, false);
                     int color = getShadingColor(facing, -1);
-                    RenderKCRRouteBase.RenderType renderType = this.getRenderType(world, pos.offset(facing.rotateYCounterclockwise(), leftBlocks), state);
+                    RenderKCRRouteBase.RenderType renderType = this.getRenderType(world, pos.relative(facing.getCounterClockWise(), leftBlocks), state);
                     if ((renderType == RenderKCRRouteBase.RenderType.ARROW || renderType == RenderKCRRouteBase.RenderType.ROUTE) && IBlock.getStatePropertySafe(state, SIDE_EXTENDED) != EnumSide.SINGLE) {
                         float width = (float)(leftBlocks + rightBlocks + 1) - this.sidePadding * 2.0F;
                         float height = 1.0F - this.topPadding - this.bottomPadding;
                         int arrowDirection = IBlock.getStatePropertySafe(state, this.arrowDirectionProperty);
-                        Identifier resourceLocation;
+                        ResourceLocation resourceLocation;
                         if (renderType == RenderKCRRouteBase.RenderType.ARROW) {
                             resourceLocation = IVRClientData.DATA_CACHE.getDirectionArrow(
                                     platformId,
@@ -95,17 +95,16 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
                         RenderTrains.scheduleRender(resourceLocation, false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matricesNew, vertexConsumer) -> {
                             storedMatrixTransformations.transform(matricesNew);
                             IDrawing.drawTexture(matricesNew, vertexConsumer, leftBlocks == 0 ? this.sidePadding : 0.0F, this.topPadding, 0.0F, 1.0F - (rightBlocks == 0 ? this.sidePadding : 0.0F), 1.0F - this.bottomPadding, 0.0F, ((float)leftBlocks - (leftBlocks == 0 ? 0.0F : this.sidePadding)) / width, 0.0F, (width - (float)rightBlocks + (rightBlocks == 0 ? 0.0F : this.sidePadding)) / width, 1.0F, facing.getOpposite(), color, light);
-                            matricesNew.pop();
+                            matricesNew.popPose();
                         });
                     }
-
                     this.renderAdditional(storedMatrixTransformations, platformId, state, leftBlocks, rightBlocks, facing.getOpposite(), color, light);
                 }
             }
-
         }
     }
 
+    @Override
     public boolean shouldRenderOffScreen(T blockEntity) {
         return true;
     }
@@ -125,20 +124,18 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
         return IBlock.getStatePropertySafe(state, SIDE_EXTENDED) == EnumSide.RIGHT;
     }
 
-    protected abstract RenderKCRRouteBase.RenderType getRenderType(BlockView var1, BlockPos var2, BlockState var3);
+    protected abstract RenderKCRRouteBase.RenderType getRenderType(BlockGetter var1, BlockPos var2, BlockState var3);
 
     protected abstract void renderAdditional(StoredMatrixTransformations var1, long var2, BlockState var4, int var5, int var6, Direction var7, int var8, int var9);
 
-    private int getTextureNumber(BlockView world, BlockPos pos, Direction facing, boolean searchLeft) {
+    private int getTextureNumber(BlockGetter world, BlockPos pos, Direction facing, boolean searchLeft) {
         int number = 0;
         Block thisBlock = world.getBlockState(pos).getBlock();
-
         while(true) {
-            BlockState state = world.getBlockState(pos.offset(searchLeft ? facing.rotateYCounterclockwise() : facing.rotateYClockwise(), number));
+            BlockState state = world.getBlockState(pos.relative(searchLeft ? facing.getCounterClockWise() : facing.getClockWise(), number));
             if (state.getBlock() != thisBlock) {
                 break;
             }
-
             boolean isLeft = this.isLeft(state);
             boolean isRight = this.isRight(state);
             if (number != 0) {
@@ -150,7 +147,6 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
                     break;
                 }
             }
-
             ++number;
             if (searchLeft) {
                 if (isLeft) {
@@ -160,7 +156,6 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
                 break;
             }
         }
-
         return number - 1;
     }
 

@@ -2,12 +2,13 @@ package net.hulan.ivr.block;
 
 import mtr.block.IBlock;
 import mtr.mappings.BlockEntityMapper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockModernRouteSign extends BlockKCRRouteSignBase {
 
@@ -16,7 +17,7 @@ public class BlockModernRouteSign extends BlockKCRRouteSignBase {
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
         boolean isBottom = IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.LOWER;
         return IBlock.getVoxelShapeByDirection(2.0D, isBottom ? 10.0D : 0.0D, 0.0D, 14.0D, 16.0D, 1.0D, IBlock.getStatePropertySafe(state, FACING));
     }

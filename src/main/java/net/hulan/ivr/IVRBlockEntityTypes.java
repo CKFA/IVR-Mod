@@ -3,7 +3,7 @@ package net.hulan.ivr;
 import mtr.RegistryObject;
 import mtr.mappings.RegistryUtilities;
 import net.hulan.ivr.block.*;
-import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public interface IVRBlockEntityTypes {
 

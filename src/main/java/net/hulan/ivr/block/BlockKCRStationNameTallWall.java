@@ -2,14 +2,15 @@ package net.hulan.ivr.block;
 
 import mtr.block.IBlock;
 import mtr.mappings.BlockEntityMapper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockKCRStationNameTallWall extends BlockKCRStationNameTallBase {
 
@@ -18,16 +19,16 @@ public class BlockKCRStationNameTallWall extends BlockKCRStationNameTallBase {
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
-        Pair<Integer, Integer> bounds = getBounds(state);
-        return IBlock.getVoxelShapeByDirection(2.0D, (double) bounds.getLeft(), 0.0D, 14.0D, (double) bounds.getRight(), 0.5D, IBlock.getStatePropertySafe(state, FACING));
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
+        Tuple<Integer, Integer> bounds = getBounds(state);
+        return IBlock.getVoxelShapeByDirection(2.0F, (double) bounds.getA(), 0.0F, 14.0F, (double) bounds.getB(), 0.5F, IBlock.getStatePropertySafe(state, FACING));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction blockSide = ctx.getSide();
-        Direction facing = blockSide != Direction.UP && blockSide != Direction.DOWN ? blockSide.getOpposite() : ctx.getPlayerFacing();
-        return IBlock.isReplaceable(ctx, Direction.UP, 3) ? this.getDefaultState().with(FACING, facing).with(METAL, true).with(THIRD, EnumThird.LOWER) : null;
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        Direction blockSide = ctx.getClickedFace();
+        Direction facing = blockSide != Direction.UP && blockSide != Direction.DOWN ? blockSide.getOpposite() : ctx.getHorizontalDirection();
+        return IBlock.isReplaceable(ctx, Direction.UP, 3) ? defaultBlockState().setValue(FACING, facing).setValue(METAL, true).setValue(THIRD, EnumThird.LOWER) : null;
     }
 
     @Override

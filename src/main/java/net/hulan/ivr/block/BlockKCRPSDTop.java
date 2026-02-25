@@ -13,106 +13,109 @@ import mtr.mappings.EntityBlockMapper;
 import net.hulan.ivr.IVRBlockEntityTypes;
 import net.hulan.ivr.IVRBlocks;
 import net.hulan.ivr.IVRItems;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
 public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBlockMapper, IBlock {
 
-    public static final BooleanProperty AIR_LEFT = BooleanProperty.of("air_left");
-    public static final BooleanProperty AIR_RIGHT = BooleanProperty.of("air_right");
-    public static final IntProperty ARROW_DIRECTION = IntProperty.of("propagate_property", 0, 3);
-    public static final EnumProperty<BlockKCRPSDTop.EnumPersistent> PERSISTENT = EnumProperty.of("persistent", BlockKCRPSDTop.EnumPersistent.class);
+    public static final BooleanProperty AIR_LEFT = BooleanProperty.create("air_left");
+    public static final BooleanProperty AIR_RIGHT = BooleanProperty.create("air_right");
+    public static final IntegerProperty ARROW_DIRECTION = IntegerProperty.create("propagate_property", 0, 3);
+    public static final EnumProperty<EnumPersistent> PERSISTENT = EnumProperty.create("persistent", BlockKCRPSDTop.EnumPersistent.class);
 
     public BlockKCRPSDTop() {
-        super(Settings.of(Material.METAL, MapColor.OFF_WHITE).requiresTool().strength(2.0F).nonOpaque());
+        super(Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult) {
+    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         return IBlock.checkHoldingItem(world, player, (item) -> {
             if (item == Items.BRUSH.get()) {
-                world.setBlockState(pos, state.cycle(ARROW_DIRECTION));
-                this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYClockwise(), ARROW_DIRECTION, 1);
-                this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYCounterclockwise(), ARROW_DIRECTION, 1);
+                world.setBlockAndUpdate(pos, state.cycle(ARROW_DIRECTION));
+                propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), ARROW_DIRECTION, 1);
+                propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), ARROW_DIRECTION, 1);
             } else {
                 boolean shouldBePersistent = IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE;
-                this.setState(world, pos, shouldBePersistent);
-                this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYClockwise(), (offsetPos) -> this.setState(world, offsetPos, shouldBePersistent), 1);
-                this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYCounterclockwise(), (offsetPos) -> this.setState(world, offsetPos, shouldBePersistent), 1);
+                setState(world, pos, shouldBePersistent);
+                propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), (offsetPos) -> setState(world, offsetPos, shouldBePersistent), 1);
+                propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), (offsetPos) -> setState(world, offsetPos, shouldBePersistent), 1);
             }
-
-        }, null, Items.BRUSH.get(), net.minecraft.item.Items.SHEARS);
+        }, null, Items.BRUSH.get(), net.minecraft.world.item.Items.SHEARS);
     }
 
-    private void setState(World world, BlockPos pos, boolean shouldBePersistent) {
-        Block blockBelow = world.getBlockState(pos.down()).getBlock();
+    private void setState(Level world, BlockPos pos, boolean shouldBePersistent) {
+        Block blockBelow = world.getBlockState(pos.below()).getBlock();
         if (blockBelow instanceof BlockKCRPSDDoor || blockBelow instanceof BlockKCRPSDGlass || blockBelow instanceof BlockKCRPSDGlassEnd) {
             if (shouldBePersistent) {
-                world.setBlockState(pos, world.getBlockState(pos).with(PERSISTENT, blockBelow instanceof BlockKCRPSDDoor ? BlockKCRPSDTop.EnumPersistent.ARROW : (blockBelow instanceof BlockKCRPSDGlass ? BlockKCRPSDTop.EnumPersistent.ROUTE : BlockKCRPSDTop.EnumPersistent.BLANK)));
+                world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(PERSISTENT, blockBelow instanceof BlockKCRPSDDoor ? BlockKCRPSDTop.EnumPersistent.ARROW : (blockBelow instanceof BlockKCRPSDGlass ? BlockKCRPSDTop.EnumPersistent.ROUTE : BlockKCRPSDTop.EnumPersistent.BLANK)));
             } else {
-                world.setBlockState(pos, world.getBlockState(pos).with(PERSISTENT, BlockKCRPSDTop.EnumPersistent.NONE));
+                world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(PERSISTENT, BlockKCRPSDTop.EnumPersistent.NONE));
             }
         }
-
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public @NotNull BlockState rotate(BlockState state, Rotation rotation) {
         return state;
     }
 
     @Override
-    public Item asItem() {
+    public @NotNull Item asItem() {
         return IVRItems.KCR_PSD_GLASS_1.get();
     }
 
     @Override
-    public ItemStack getPickStack(BlockView blockGetter, BlockPos blockPos, BlockState blockState) {
-        return new ItemStack(this.asItem());
+    public @NotNull ItemStack getCloneItemStack(BlockGetter blockGetter, BlockPos blockPos, BlockState blockState) {
+        return new ItemStack(asItem());
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        Block blockDown = world.getBlockState(pos.down()).getBlock();
+    public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        Block blockDown = world.getBlockState(pos.below()).getBlock();
         if (blockDown instanceof BlockPSDAPGBase) {
-            blockDown.onBreak(world, pos.down(), world.getBlockState(pos.down()), player);
-            world.setBlockState(pos.down(), Blocks.AIR.getDefaultState());
+            blockDown.playerWillDestroy(world, pos.below(), world.getBlockState(pos.below()), player);
+            world.setBlockAndUpdate(pos.below(), Blocks.AIR.defaultBlockState());
         }
-
-        super.onBreak(world, pos, state, player);
+        super.playerWillDestroy(world, pos, state, player);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
-        return direction == Direction.DOWN && IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE && !(newState.getBlock() instanceof BlockPSDAPGBase) ? Blocks.AIR.getDefaultState() : getActualState(world, pos);
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState newState, LevelAccessor world, BlockPos pos, BlockPos posFrom) {
+        return direction == Direction.DOWN && IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE && !(newState.getBlock() instanceof BlockPSDAPGBase) ? Blocks.AIR.defaultBlockState() : getActualState(world, pos);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
         VoxelShape baseShape = IBlock.getVoxelShapeByDirection(0.0D, IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE ? 0.0D : 7.5D, 0.0D, 16.0D, 16.0D, 6.0D, IBlock.getStatePropertySafe(state, FACING));
         boolean airLeft = IBlock.getStatePropertySafe(state, AIR_LEFT);
         boolean airRight = IBlock.getStatePropertySafe(state, AIR_RIGHT);
@@ -121,12 +124,12 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
 
     @SuppressWarnings("deprecation")
     @Override
-    public PistonBehavior getPistonBehavior(BlockState blockState) {
-        return PistonBehavior.BLOCK;
+    public @NotNull PushReaction getPistonPushReaction(BlockState blockState) {
+        return PushReaction.BLOCK;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, SIDE_EXTENDED, AIR_LEFT, AIR_RIGHT, ARROW_DIRECTION, PERSISTENT);
     }
 
@@ -135,12 +138,12 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
         return new TileEntityKCRPSDTop(pos, state);
     }
 
-    public static BlockState getActualState(BlockView world, BlockPos pos) {
+    public static BlockState getActualState(BlockGetter world, BlockPos pos) {
         Direction facing = null;
         EnumSide side = null;
         boolean airLeft = false;
         boolean airRight = false;
-        BlockState stateBelow = world.getBlockState(pos.down());
+        BlockState stateBelow = world.getBlockState(pos.below());
         Block blockBelow = stateBelow.getBlock();
         if (blockBelow instanceof BlockKCRPSDGlass || blockBelow instanceof BlockKCRPSDDoor || blockBelow instanceof BlockKCRPSDGlassEnd) {
             if (blockBelow instanceof BlockKCRPSDDoor) {
@@ -148,34 +151,28 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
             } else {
                 side = IBlock.getStatePropertySafe(stateBelow, SIDE_EXTENDED);
             }
-
             if (blockBelow instanceof BlockKCRPSDGlassEnd) {
                 if (IBlock.getStatePropertySafe(stateBelow, BlockKCRPSDGlassEnd.TOUCHING_LEFT) == BlockPSDAPGGlassEndBase.EnumPSDAPGGlassEndSide.AIR) {
                     airLeft = true;
                 }
-
                 if (IBlock.getStatePropertySafe(stateBelow, BlockKCRPSDGlassEnd.TOUCHING_RIGHT) == BlockPSDAPGGlassEndBase.EnumPSDAPGGlassEndSide.AIR) {
                     airRight = true;
                 }
             }
-
             facing = IBlock.getStatePropertySafe(stateBelow, FACING);
         }
-
         BlockState oldState = world.getBlockState(pos);
-        BlockState newState = (oldState.getBlock() instanceof BlockKCRPSDTop ? oldState : IVRBlocks.KCR_PSD_TOP.get().getDefaultState()).with(AIR_LEFT, airLeft).with(AIR_RIGHT, airRight);
+        BlockState newState = (oldState.getBlock() instanceof BlockKCRPSDTop ? oldState : IVRBlocks.KCR_PSD_TOP.get().defaultBlockState()).setValue(AIR_LEFT, airLeft).setValue(AIR_RIGHT, airRight);
         if (facing != null) {
-            newState = newState.with(FACING, facing);
+            newState = newState.setValue(FACING, facing);
         }
-
         if (side != null) {
-            newState = newState.with(SIDE_EXTENDED, side);
+            newState = newState.setValue(SIDE_EXTENDED, side);
         }
-
         return newState;
     }
 
-    public enum EnumPersistent implements StringIdentifiable {
+    public enum EnumPersistent implements StringRepresentable {
         NONE("none"),
         ARROW("arrow"),
         ROUTE("route"),
@@ -184,12 +181,12 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
         private final String name;
 
         EnumPersistent(String nameIn) {
-            this.name = nameIn;
+            name = nameIn;
         }
 
         @Override
-        public String asString() {
-            return this.name;
+        public @NotNull String getSerializedName() {
+            return name;
         }
     }
 
@@ -208,12 +205,11 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
         }
 
         public long getPlatformId(Set<Platform> platforms, DataCache dataCache) {
-            if (dataCache.needsRefresh(this.cachedRefreshTime)) {
-                this.cachedPlatformId = RailwayData.getClosePlatformId(platforms, dataCache, this.getPos());
-                this.cachedRefreshTime = System.currentTimeMillis();
+            if (dataCache.needsRefresh(cachedRefreshTime)) {
+                cachedPlatformId = RailwayData.getClosePlatformId(platforms, dataCache, getBlockPos());
+                cachedRefreshTime = System.currentTimeMillis();
             }
-
-            return this.cachedPlatformId;
+            return cachedPlatformId;
         }
     }
 }

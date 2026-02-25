@@ -4,9 +4,10 @@ import mtr.block.BlockPSDAPGDoorBase;
 import mtr.mappings.BlockEntityMapper;
 import net.hulan.ivr.IVRBlockEntityTypes;
 import net.hulan.ivr.IVRItems;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockKCRPSDDoor extends BlockPSDAPGDoorBase {
 
@@ -18,12 +19,12 @@ public class BlockKCRPSDDoor extends BlockPSDAPGDoorBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRPSDDoor.TileEntityKCRPSDDoor(this.style, pos, state);
+        return new BlockKCRPSDDoor.TileEntityKCRPSDDoor(style, pos, state);
     }
 
     @Override
-    public Item asItem() {
-        return this.style == 0 ? IVRItems.KCR_PSD_DOOR_1.get() : IVRItems.KCR_PSD_DOOR_2.get();
+    public @NotNull Item asItem() {
+        return style == 0 ? IVRItems.KCR_PSD_DOOR_1.get() : IVRItems.KCR_PSD_DOOR_2.get();
     }
 
     public static class TileEntityKCRPSDDoor extends TileEntityPSDAPGDoorBase {

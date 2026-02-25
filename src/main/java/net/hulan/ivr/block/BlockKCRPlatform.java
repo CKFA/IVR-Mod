@@ -1,25 +1,28 @@
 package net.hulan.ivr.block;
 
 import mtr.mappings.BlockDirectionalMapper;
-import net.minecraft.block.*;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockKCRPlatform extends BlockDirectionalMapper {
 
     public BlockKCRPlatform() {
-        super(Settings.of(Material.METAL, MapColor.YELLOW).requiresTool().strength(2.0F));
+        super(Properties.of(Material.METAL, MaterialColor.COLOR_YELLOW).requiresCorrectToolForDrops().strength(2.0F));
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getPlayer().getHorizontalFacing());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 }

@@ -8,14 +8,14 @@ import mtr.render.RenderTrains;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockKCRPSDTop;
 import net.hulan.ivr.client.IVRClientData;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.BlockView;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntityKCRPSDTop> {
 
@@ -31,10 +31,10 @@ public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntit
     }
 
     @Override
-    protected RenderType getRenderType(BlockView world, BlockPos pos, BlockState state) {
+    protected RenderType getRenderType(BlockGetter world, BlockPos pos, BlockState state) {
         BlockKCRPSDTop.EnumPersistent persistent = IBlock.getStatePropertySafe(state, BlockKCRPSDTop.PERSISTENT);
         if (persistent == BlockKCRPSDTop.EnumPersistent.NONE) {
-            Block blockBelow = world.getBlockState(pos.down()).getBlock();
+            Block blockBelow = world.getBlockState(pos.below()).getBlock();
             if (blockBelow instanceof BlockPSDAPGDoorBase) {
                 return RenderType.ARROW;
             } else {
@@ -51,7 +51,7 @@ public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntit
         boolean airRight = IBlock.getStatePropertySafe(state, BlockKCRPSDTop.AIR_RIGHT);
         boolean persistent = IBlock.getStatePropertySafe(state, BlockKCRPSDTop.PERSISTENT) != BlockKCRPSDTop.EnumPersistent.NONE;
         if ((airLeft || airRight) && !persistent) {
-            RenderTrains.scheduleRender(new Identifier("ivr:textures/block/kcr_psd_top.png"), false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
+            RenderTrains.scheduleRender(new ResourceLocation("ivr:textures/block/kcr_psd_top.png"), false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
                 storedMatrixTransformations.transform(matrices);
                 if (airLeft) {
                     IDrawing.drawTexture(matrices, vertexConsumer, -0.125F, 0.0F, 0.5F, 0.5F, 0.0F, -0.125F, 0.5F, 1.0F, -0.125F, -0.125F, 1.0F, 0.5F, 0.0F, 0.0F, 1.0F, 1.0F, facing, -1, light);
@@ -64,7 +64,6 @@ public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntit
                     IDrawing.drawTexture(matrices, vertexConsumer, 0.5F, 0.0625F, -0.5F, 0.5F - END_FRONT_OFFSET, 0.0625F, -0.5F - END_FRONT_OFFSET, 0.5F - END_FRONT_OFFSET, 1.0F, -0.5F - END_FRONT_OFFSET, 0.5F, 1.0F, -0.5F, 0.9375F, 0.0F, 1.0F, 0.9375F, facing, -1, light);
                     IDrawing.drawTexture(matrices, vertexConsumer, 0.5F, 0.0F, -0.5F, 0.5F - BOTTOM_END_DIAGONAL_OFFSET, BOTTOM_DIAGONAL_OFFSET, -0.5F - BOTTOM_END_DIAGONAL_OFFSET, 0.5F - END_FRONT_OFFSET, 0.0625F, -0.5F - END_FRONT_OFFSET, 0.5F, 0.0625F, -0.5F, 0.9375F, 0.9375F, 1.0F, 1.0F, facing, -1, light);
                 }
-
                 if (airRight) {
                     IDrawing.drawTexture(matrices, vertexConsumer, -0.5F, 0.0F, -0.125F, 0.125F, 0.0F, 0.5F, 0.125F, 1.0F, 0.5F, -0.5F, 1.0F, -0.125F, 0.0F, 0.0F, 1.0F, 1.0F, facing, -1, light);
                     IDrawing.drawTexture(matrices, vertexConsumer, 0.25F + END_FRONT_OFFSET, 0.0625F, 0.25F - END_FRONT_OFFSET, -0.5F + END_FRONT_OFFSET, 0.0625F, -0.5F - END_FRONT_OFFSET, -0.5F + END_FRONT_OFFSET, 1.0F, -0.5F - END_FRONT_OFFSET, 0.25F + END_FRONT_OFFSET, 1.0F, 0.25F - END_FRONT_OFFSET, 0.0F, 0.0F, 1.0F, 0.9375F, facing.getOpposite(), -1, light);
@@ -76,8 +75,7 @@ public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntit
                     IDrawing.drawTexture(matrices, vertexConsumer, -0.5F + END_FRONT_OFFSET, 0.0625F, -0.5F - END_FRONT_OFFSET, -0.5F, 0.0625F, -0.5F, -0.5F, 1.0F, -0.5F, -0.5F + END_FRONT_OFFSET, 1.0F, -0.5F - END_FRONT_OFFSET, 0.0F, 0.0F, 0.0625F, 0.9375F, facing, -1, light);
                     IDrawing.drawTexture(matrices, vertexConsumer, -0.5F + BOTTOM_END_DIAGONAL_OFFSET, BOTTOM_DIAGONAL_OFFSET, -0.5F - BOTTOM_END_DIAGONAL_OFFSET, -0.5F, 0.0F, -0.5F, -0.5F, 0.0625F, -0.5F, -0.5F + END_FRONT_OFFSET, 0.0625F, -0.5F - END_FRONT_OFFSET, 0.0F, 0.9375F, 0.0625F, 1.0F, facing, -1, light);
                 }
-
-                matrices.pop();
+                matrices.popPose();
             });
         }
     }
@@ -93,12 +91,10 @@ public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntit
             if (airLeft) {
                 IDrawing.drawTexture(matrices, vertexConsumer, END_FRONT_OFFSET, 0.90625F, -0.625F - END_FRONT_OFFSET, 0.75F + END_FRONT_OFFSET, 0.9375F, 0.125F - END_FRONT_OFFSET, facing, -1, light);
             }
-
             if (airRight) {
                 IDrawing.drawTexture(matrices, vertexConsumer, 0.25F - END_FRONT_OFFSET, 0.90625F, 0.125F - END_FRONT_OFFSET, 1.0F - END_FRONT_OFFSET, 0.9375F, -0.625F - END_FRONT_OFFSET, facing, -1, light);
             }
-
-            matrices.pop();
+            matrices.popPose();
         });
     }
 
@@ -108,9 +104,9 @@ public class RenderKCRPSDTop extends RenderKCRRouteBase<BlockKCRPSDTop.TileEntit
     }
 
     static {
-        END_FRONT_OFFSET = 1.0F / (MathHelper.SQUARE_ROOT_OF_TWO * 16.0F);
+        END_FRONT_OFFSET = 1.0F / (Mth.SQRT_OF_TWO * 16.0F);
         BOTTOM_DIAGONAL_OFFSET = ((float)Math.sqrt(3.0D) - 1.0F) / 32.0F;
-        ROOT_TWO_SCALED = MathHelper.SQUARE_ROOT_OF_TWO / 16.0F;
-        BOTTOM_END_DIAGONAL_OFFSET = END_FRONT_OFFSET - BOTTOM_DIAGONAL_OFFSET / MathHelper.SQUARE_ROOT_OF_TWO;
+        ROOT_TWO_SCALED = Mth.SQRT_OF_TWO / 16.0F;
+        BOTTOM_END_DIAGONAL_OFFSET = END_FRONT_OFFSET - BOTTOM_DIAGONAL_OFFSET / Mth.SQRT_OF_TWO;
     }
 }

@@ -4,7 +4,12 @@ import mtr.RegistryObject;
 import mtr.block.BlockStationColor;
 import mtr.block.BlockStationColorSlab;
 import net.hulan.ivr.block.*;
-import net.minecraft.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 
 public interface IVRBlocks {
 
@@ -40,21 +45,21 @@ public interface IVRBlocks {
     RegistryObject<Block> MODERN_SIGN_7_ODD = new RegistryObject<>(() -> new BlockModernSign(7, true));
     RegistryObject<Block> MODERN_SIGN_POLE = new RegistryObject<>(BlockModernSignPole::new);
     RegistryObject<Block> MODERN_SIGN_MIDDLE = new RegistryObject<>(() -> new BlockModernSign(0, false));
-    RegistryObject<Block> KCR_STATION_WALL = new RegistryObject<>(() -> new Block(AbstractBlock.Settings.copy(Blocks.PURPUR_PILLAR)));
-    RegistryObject<Block> KCR_STATION_WALL_YELLOW = new RegistryObject<>(() -> new Block(AbstractBlock.Settings.copy(Blocks.PURPUR_PILLAR)));
-    RegistryObject<Block> KCR_STATION_WALL_SLAB = new RegistryObject<>(() -> new SlabBlock(AbstractBlock.Settings.copy(Blocks.PURPUR_PILLAR)));
-    RegistryObject<Block> KCR_STATION_WALL_YELLOW_SLAB = new RegistryObject<>(() -> new SlabBlock(AbstractBlock.Settings.copy(Blocks.PURPUR_PILLAR)));
-    RegistryObject<Block> KCR_STATION_COLOR_STATION_WALL = new RegistryObject<>(() -> new BlockStationColor(AbstractBlock.Settings.copy(KCR_STATION_WALL.get())));
-    RegistryObject<Block> KCR_STATION_COLOR_STATION_WALL_SLAB = new RegistryObject<>(() -> new BlockStationColorSlab(AbstractBlock.Settings.copy(KCR_STATION_WALL_SLAB.get())));
+    RegistryObject<Block> KCR_STATION_WALL = new RegistryObject<>(() -> new Block(BlockBehaviour.Properties.copy(Blocks.PURPUR_PILLAR)));
+    RegistryObject<Block> KCR_STATION_WALL_YELLOW = new RegistryObject<>(() -> new Block(BlockBehaviour.Properties.copy(Blocks.PURPUR_PILLAR)));
+    RegistryObject<Block> KCR_STATION_WALL_SLAB = new RegistryObject<>(() -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.PURPUR_PILLAR)));
+    RegistryObject<Block> KCR_STATION_WALL_YELLOW_SLAB = new RegistryObject<>(() -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.PURPUR_PILLAR)));
+    RegistryObject<Block> KCR_STATION_COLOR_STATION_WALL = new RegistryObject<>(() -> new BlockStationColor(BlockBehaviour.Properties.copy(KCR_STATION_WALL.get())));
+    RegistryObject<Block> KCR_STATION_COLOR_STATION_WALL_SLAB = new RegistryObject<>(() -> new BlockStationColorSlab(BlockBehaviour.Properties.copy(KCR_STATION_WALL_SLAB.get())));
     RegistryObject<Block> KCR_PLATFORM_NORMAL = new RegistryObject<>(BlockKCRPlatform::new);
     RegistryObject<Block> KCR_PLATFORM_YELLOW_LINE = new RegistryObject<>(BlockKCRPlatform::new);
     RegistryObject<Block> KCR_PLATFORM_INDENTED = new RegistryObject<>(BlockKCRPlatformIndented::new);
     RegistryObject<Block> KCR_CLOCK = new RegistryObject<>(BlockKCRClock::new);
     RegistryObject<Block> KCR_CLOCK_POLE = new RegistryObject<>(BlockKCRClockPole::new);
-    RegistryObject<Block> KCR_CEILING_AUTO = new RegistryObject<>(() -> new BlockKCRCeilingAuto(AbstractBlock.Settings.of(Material.METAL, MapColor.OFF_WHITE).requiresTool().strength(2.0F).luminance((state) -> 15)));
-    RegistryObject<Block> KCR_CEILING_LIGHT = new RegistryObject<>(() -> new BlockKCRCeiling(AbstractBlock.Settings.of(Material.METAL, MapColor.OFF_WHITE).requiresTool().strength(2.0F).luminance((state) -> 15)));
-    RegistryObject<Block> KCR_CEILING_NO_LIGHT = new RegistryObject<>(() -> new BlockKCRCeiling(AbstractBlock.Settings.of(Material.METAL, MapColor.OFF_WHITE).requiresTool().strength(2.0F)));
-    RegistryObject<Block> IVR_LOGO = new RegistryObject<>(() -> new Block(AbstractBlock.Settings.of(Material.METAL, MapColor.GRAY).requiresTool().strength(2.0F).luminance((state) -> 10)));
+    RegistryObject<Block> KCR_CEILING_AUTO = new RegistryObject<>(BlockKCRCeilingAuto::new);
+    RegistryObject<Block> KCR_CEILING_LIGHT = new RegistryObject<>(() -> new BlockKCRCeiling(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(2.0F).lightLevel((state) -> 15)));
+    RegistryObject<Block> KCR_CEILING_NO_LIGHT = new RegistryObject<>(() -> new BlockKCRCeiling(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(2.0F)));
+    RegistryObject<Block> IVR_LOGO = new RegistryObject<>(() -> new Block(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).requiresCorrectToolForDrops().strength(2.0F).lightLevel((state) -> 10)));
     RegistryObject<Block> KCR_APG_DOOR = new RegistryObject<>(BlockKCRAPGDoor::new);
     RegistryObject<Block> KCR_APG_GLASS = new RegistryObject<>(BlockKCRAPGGlass::new);
     RegistryObject<Block> KCR_APG_GLASS_END = new RegistryObject<>(BlockKCRAPGGlassEnd::new);

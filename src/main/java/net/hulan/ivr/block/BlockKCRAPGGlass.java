@@ -6,38 +6,40 @@ import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.EntityBlockMapper;
 import net.hulan.ivr.IVRBlockEntityTypes;
 import net.hulan.ivr.IVRItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockKCRAPGGlass extends BlockPSDAPGGlassBase implements EntityBlockMapper {
-    public static final IntProperty ARROW_DIRECTION = IntProperty.of("propagate_property", 0, 3);
+
+    public static final IntegerProperty ARROW_DIRECTION = IntegerProperty.create("propagate_property", 0, 3);
 
     public BlockKCRAPGGlass() {
     }
 
     @Override
-    public Item asItem() {
+    public @NotNull Item asItem() {
         return IVRItems.KCR_APG_GLASS.get();
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult) {
-        double y = blockHitResult.getPos().y;
+    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+        double y = blockHitResult.getBlockPos().getY();
         return IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER && y - Math.floor(y) > 0.21875D ? IBlock.checkHoldingBrush(world, player, () -> {
-            world.setBlockState(pos, state.cycle(ARROW_DIRECTION));
-            this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYClockwise(), ARROW_DIRECTION, 3);
-            this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYCounterclockwise(), ARROW_DIRECTION, 3);
-        }) : super.onUse(state, world, pos, player, interactionHand, blockHitResult);
+            world.setBlockAndUpdate(pos, state.cycle(ARROW_DIRECTION));
+            propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), ARROW_DIRECTION, 3);
+            propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), ARROW_DIRECTION, 3);
+        }) : super.use(state, world, pos, player, interactionHand, blockHitResult);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class BlockKCRAPGGlass extends BlockPSDAPGGlassBase implements EntityBloc
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, HALF, SIDE_EXTENDED, ARROW_DIRECTION);
     }
 
