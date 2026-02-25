@@ -1,5 +1,6 @@
 package net.hulan.ivr.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.client.ClientData;
 import mtr.client.CustomResources;
 import mtr.client.IDrawing;
@@ -12,17 +13,16 @@ import net.hulan.ivr.block.BlockClassicalSign;
 import net.hulan.ivr.block.BlockKCRRouteSignBase;
 import net.hulan.ivr.packet.IVRPacketTrainDataGuiClient;
 import net.hulan.ivr.render.RenderClassicalSign;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,7 +34,6 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
     private int totalPages;
     private int columns;
     private int rows;
-
     private final BlockPos signPos;
     private final boolean isClassicalSign;
     private final int length;
@@ -46,14 +45,12 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
     private final List<NameColorDataBase> routesForList = new ArrayList<>();
     private final List<NameColorDataBase> stationsForList = new ArrayList<>();
     private final List<String> allSignIds = new ArrayList<>();
-
-    private final ButtonWidget[] buttonsEdit;
-    private final ButtonWidget[] buttonsSelection;
-    private final ButtonWidget buttonClear;
-    private final ButtonWidget buttonLight;
-    private final TexturedButtonWidget buttonPrevPage;
-    private final TexturedButtonWidget buttonNextPage;
-
+    private final Button[] buttonsEdit;
+    private final Button[] buttonsSelection;
+    private final Button buttonClear;
+    private final Button buttonLight;
+    private final ImageButton buttonPrevPage;
+    private final ImageButton buttonNextPage;
     private static final int SIGN_SIZE = 32;
     private static final int SIGN_BUTTON_SIZE = 16;
     private static final int BUTTON_Y_START = SIGN_SIZE + SQUARE_SIZE + SQUARE_SIZE / 2;
@@ -62,15 +59,13 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
         super(Text.literal(""));
         editingIndex = -1;
         this.signPos = signPos;
-        final ClientWorld world = MinecraftClient.getInstance().world;
-
+        final ClientLevel world = Minecraft.getInstance().level;
         for (final BlockClassicalSign.SignType signType : BlockClassicalSign.SignType.values()) {
             allSignIds.add(signType.toString());
         }
         final List<String> sortedKeys = new ArrayList<>(CustomResources.CUSTOM_SIGNS.keySet());
         Collections.sort(sortedKeys);
         allSignIds.addAll(sortedKeys);
-
         try {
             final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, signPos);
             if (station != null) {
@@ -81,18 +76,15 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
                     final List<String> destinations = exits.get(exitParent);
                     exitsForList.add(new DataConverter(Station.serializeExit(exitParent), exitParent + " " + (!destinations.isEmpty() ? destinations.get(0) : ""), 0));
                 });
-
                 final List<Platform> platforms = new ArrayList<>(ClientData.DATA_CACHE.requestStationIdToPlatforms(station.id).values());
                 Collections.sort(platforms);
                 platforms.stream().map(platform -> new DataConverter(platform.id, platform.name + " " + IGui.mergeStations(ClientData.DATA_CACHE.requestPlatformIdToRoutes(platform.id).stream().map(route -> route.stationDetails.get(route.stationDetails.size() - 1).stationName).collect(Collectors.toList())), 0)).forEach(platformsForList::add);
-
                 ClientData.DATA_CACHE.getAllRoutesIncludingConnectingStations(station).forEach((color, route) -> routesForList.add(new DataConverter(route.color, route.name, route.color)));
                 ClientData.DATA_CACHE.getConnectingStationsIncludingThisOne(station).forEach(connectingStation -> stationsForList.add(new DataConverter(connectingStation.id, connectingStation.name, connectingStation.color)));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         if (world != null) {
             final BlockEntity entity = world.getBlockEntity(signPos);
             if (entity instanceof BlockClassicalSign.TileEntityClassicalSign signEntity) {
@@ -120,102 +112,86 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
             isClassicalSign = false;
             luminance = false;
         }
-
-        buttonsEdit = new ButtonWidget[length];
+        buttonsEdit = new Button[length];
         for (int i = 0; i < buttonsEdit.length; i++) {
             final int index = i;
             buttonsEdit[i] = UtilitiesClient.newButton(Text.translatable("selectWorld.edit"), button -> edit(index));
         }
-
-        buttonsSelection = new ButtonWidget[allSignIds.size()];
+        buttonsSelection = new Button[allSignIds.size()];
         for (int i = 0; i < allSignIds.size(); i++) {
             final int index = i;
             buttonsSelection[i] = UtilitiesClient.newButton(SIGN_BUTTON_SIZE, Text.literal(""), button -> setNewSignId(allSignIds.get(index)));
         }
-
         buttonClear = UtilitiesClient.newButton(Text.translatable("gui.mtr.reset_sign"), button -> setNewSignId(null));
         buttonLight = UtilitiesClient.newButton(Text.translatable("gui.ivr.cycle_light").append(Text.translatable(luminance ? "options.mtr.on" : "options.mtr.off")), button -> setLuminance(!luminance));
-        buttonPrevPage = new TexturedButtonWidget(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new Identifier("mtr:textures/gui/icon_left.png"), 20, 40, button -> setPage(page - 1));
-        buttonNextPage = new TexturedButtonWidget(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new Identifier("mtr:textures/gui/icon_right.png"), 20, 40, button -> setPage(page + 1));
+        buttonPrevPage = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_left.png"), 20, 40, button -> setPage(page - 1));
+        buttonNextPage = new ImageButton(0, 0, 0, SQUARE_SIZE, 0, 0, 20, new ResourceLocation("mtr:textures/gui/icon_right.png"), 20, 40, button -> setPage(page + 1));
     }
 
     @Override
     protected void init() {
         super.init();
-
         for (int i = 0; i < buttonsEdit.length; i++) {
             IDrawing.setPositionAndWidth(buttonsEdit[i], (width - SIGN_SIZE * length) / 2 + i * SIGN_SIZE, SIGN_SIZE, SIGN_SIZE);
             addDrawableChild(buttonsEdit[i]);
         }
-
         columns = Math.max((width - SIGN_BUTTON_SIZE * 3) / (SIGN_BUTTON_SIZE * 8) * 2, 1);
         rows = Math.max((height - SIGN_SIZE - SQUARE_SIZE * 4) / SIGN_BUTTON_SIZE, 1);
-
         final int xOffsetSmall = (width - SIGN_BUTTON_SIZE * (columns * 4 + 3)) / 2 + SIGN_BUTTON_SIZE;
         final int xOffsetBig = xOffsetSmall + SIGN_BUTTON_SIZE * (columns + 1);
-
         totalPages = loopSigns((index, x, y, isBig) -> {
             IDrawing.setPositionAndWidth(buttonsSelection[index], (isBig ? xOffsetBig : xOffsetSmall) + x, BUTTON_Y_START + y, isBig ? SIGN_BUTTON_SIZE * 3 : SIGN_BUTTON_SIZE);
             buttonsSelection[index].visible = false;
             addDrawableChild(buttonsSelection[index]);
         }, true);
-
         final int buttonClearX = (width - PANEL_WIDTH - SQUARE_SIZE * 4) / 2;
         final int buttonY = height - SQUARE_SIZE * 2;
-
         IDrawing.setPositionAndWidth(buttonClear, buttonClearX, buttonY, PANEL_WIDTH);
         buttonClear.visible = false;
         addDrawableChild(buttonClear);
-
         IDrawing.setPositionAndWidth(buttonLight, buttonClearX - 144, buttonY, PANEL_WIDTH);
         buttonLight.visible = true;
         addDrawableChild(buttonLight);
-
         IDrawing.setPositionAndWidth(buttonPrevPage, buttonClearX + PANEL_WIDTH, buttonY, SQUARE_SIZE);
         buttonPrevPage.visible = false;
         addDrawableChild(buttonPrevPage);
         IDrawing.setPositionAndWidth(buttonNextPage, buttonClearX + PANEL_WIDTH + SQUARE_SIZE * 3, buttonY, SQUARE_SIZE);
         buttonNextPage.visible = false;
         addDrawableChild(buttonNextPage);
-
-        if (!isClassicalSign && client != null) {
-            UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this::close, platformsForList, selectedIds, true, false));
+        if (!isClassicalSign && minecraft != null) {
+            UtilitiesClient.setScreen(minecraft, new DashboardListSelectorScreen(this::onClose, platformsForList, selectedIds, true, false));
         }
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         try {
             renderBackground(matrices);
             super.render(matrices, mouseX, mouseY, delta);
-            if (client == null) {
+            if (minecraft == null) {
                 return;
             }
-
             for (int i = 0; i < signIds.length; i++) {
                 if (signIds[i] != null) {
-                    RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signIds[i], (width - SIGN_SIZE * length) / 2F + i * SIGN_SIZE, 0, SIGN_SIZE, RenderClassicalSign.getMaxWidth(signIds, i, false), RenderClassicalSign.getMaxWidth(signIds, i, true), selectedIds, Direction.UP, 0, (textureId, x, y, size, flipTexture) -> {
+                    RenderClassicalSign.drawSign(matrices, null, null, font, signPos, signIds[i], (width - SIGN_SIZE * length) / 2F + i * SIGN_SIZE, 0, SIGN_SIZE, RenderClassicalSign.getMaxWidth(signIds, i, false), RenderClassicalSign.getMaxWidth(signIds, i, true), selectedIds, Direction.UP, 0, (textureId, x, y, size, flipTexture) -> {
                         UtilitiesClient.beginDrawingTexture(textureId);
-                        drawTexture(matrices, (int) x, (int) y, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size);
+                        blit(matrices, (int) x, (int) y, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size);
                     });
                 }
             }
-
             if (editingIndex >= 0) {
                 final int xOffsetSmall = (width - SIGN_BUTTON_SIZE * (columns * 4 + 3)) / 2 + SIGN_BUTTON_SIZE;
                 final int xOffsetBig = xOffsetSmall + SIGN_BUTTON_SIZE * (columns + 1);
-
                 loopSigns((index, x, y, isBig) -> {
                     final String signId = allSignIds.get(index);
                     final CustomResources.CustomSign sign = RenderClassicalSign.getSign(signId);
                     if (sign != null) {
                         final boolean moveRight = sign.hasCustomText() && sign.flipCustomText;
                         UtilitiesClient.beginDrawingTexture(sign.textureId);
-                        RenderClassicalSign.drawSign(matrices, null, null, textRenderer, signPos, signId, (isBig ? xOffsetBig : xOffsetSmall) + x + (moveRight ? SIGN_BUTTON_SIZE * 2 : 0), BUTTON_Y_START + y, SIGN_BUTTON_SIZE, 2, 2, selectedIds, Direction.UP, 0, (textureId, x1, y1, size, flipTexture) -> drawTexture(matrices, (int) x1, (int) y1, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size));
+                        RenderClassicalSign.drawSign(matrices, null, null, font, signPos, signId, (isBig ? xOffsetBig : xOffsetSmall) + x + (moveRight ? SIGN_BUTTON_SIZE * 2 : 0), BUTTON_Y_START + y, SIGN_BUTTON_SIZE, 2, 2, selectedIds, Direction.UP, 0, (textureId, x1, y1, size, flipTexture) -> blit(matrices, (int) x1, (int) y1, 0, 0, (int) size, (int) size, (int) (flipTexture ? -size : size), (int) size));
                     }
                 }, false);
-
-                InGameHud.drawCenteredText(matrices, textRenderer, String.format("%s/%s", page + 1, totalPages), (width - PANEL_WIDTH - SQUARE_SIZE * 4) / 2 + PANEL_WIDTH + SQUARE_SIZE * 2, height - SQUARE_SIZE * 2 + TEXT_PADDING, ARGB_WHITE);
+                Gui.drawCenteredString(matrices, font, String.format("%s/%s", page + 1, totalPages), (width - PANEL_WIDTH - SQUARE_SIZE * 4) / 2 + PANEL_WIDTH + SQUARE_SIZE * 2, height - SQUARE_SIZE * 2 + TEXT_PADDING, ARGB_WHITE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,23 +205,23 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         IVRPacketTrainDataGuiClient.sendClassicalSignIdsC2S(signPos, selectedIds, signIds, luminance);
-        super.close();
+        super.onClose();
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void resize(MinecraftClient client, int width, int height) {
+    public void resize(Minecraft client, int width, int height) {
         super.resize(client, width, height);
-        for (ButtonWidget button : buttonsEdit) {
+        for (Button button : buttonsEdit) {
             button.active = true;
         }
-        for (ButtonWidget button : buttonsSelection) {
+        for (Button button : buttonsSelection) {
             button.visible = false;
         }
         editingIndex = -1;
@@ -264,13 +240,11 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
         for (int i = 0; i < allSignIds.size(); i++) {
             final CustomResources.CustomSign sign = RenderClassicalSign.getSign(allSignIds.get(i));
             final boolean isBig = sign != null && sign.hasCustomText();
-
             final boolean onPage = (isBig ? indexBig : indexSmall) / pageCount == page;
             buttonsSelection[i].visible = onPage;
             if (ignorePage || onPage) {
                 loopSignsCallback.loopSignsCallback(i, (isBig ? columnBig * 3 : columnSmall) * SIGN_BUTTON_SIZE, (isBig ? rowBig : rowSmall) * SIGN_BUTTON_SIZE, isBig);
             }
-
             if (isBig) {
                 columnBig++;
                 if (totalPagesBigCount < 0) {
@@ -306,7 +280,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
 
     private void edit(int editingIndex) {
         this.editingIndex = editingIndex;
-        for (ButtonWidget button : buttonsEdit) {
+        for (Button button : buttonsEdit) {
             button.active = true;
         }
         buttonClear.visible = true;
@@ -321,8 +295,8 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
             final boolean isPlatform = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.PLATFORM.toString()) || newSignId.equals(BlockClassicalSign.SignType.PLATFORM_FLIPPED.toString()));
             final boolean isLine = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.LINE.toString()) || newSignId.equals(BlockClassicalSign.SignType.LINE_FLIPPED.toString()));
             final boolean isStation = newSignId != null && (newSignId.equals(BlockClassicalSign.SignType.STATION.toString()) || newSignId.equals(BlockClassicalSign.SignType.STATION_FLIPPED.toString()));
-            if ((isExitLetter || isPlatform || isLine || isStation) && client != null) {
-                UtilitiesClient.setScreen(client, new DashboardListSelectorScreen(this, isExitLetter ? exitsForList : isPlatform ? platformsForList : isLine ? routesForList : stationsForList, selectedIds, false, false));
+            if ((isExitLetter || isPlatform || isLine || isStation) && minecraft != null) {
+                UtilitiesClient.setScreen(minecraft, new DashboardListSelectorScreen(this, isExitLetter ? exitsForList : isPlatform ? platformsForList : isLine ? routesForList : stationsForList, selectedIds, false, false));
             }
         }
     }
@@ -333,7 +307,7 @@ public class ClassicalSignScreen extends ScreenMapper implements IGui {
     }
 
     private void setPage(int newPage) {
-        page = MathHelper.clamp(newPage, 0, totalPages - 1);
+        page = Mth.clamp(newPage, 0, totalPages - 1);
         buttonPrevPage.visible = editingIndex >= 0 && page > 0;
         buttonNextPage.visible = editingIndex >= 0 && page < totalPages - 1;
     }

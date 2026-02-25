@@ -4,9 +4,10 @@ import mtr.block.BlockPSDAPGDoorBase;
 import mtr.mappings.BlockEntityMapper;
 import net.hulan.ivr.IVRBlockEntityTypes;
 import net.hulan.ivr.IVRItems;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockKCRAPGDoor extends BlockPSDAPGDoorBase {
 
@@ -19,7 +20,7 @@ public class BlockKCRAPGDoor extends BlockPSDAPGDoorBase {
     }
 
     @Override
-    public Item asItem() {
+    public @NotNull Item asItem() {
         return IVRItems.KCR_APG_DOOR.get();
     }
 

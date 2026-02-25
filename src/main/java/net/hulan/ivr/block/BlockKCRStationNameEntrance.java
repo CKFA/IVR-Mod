@@ -2,26 +2,28 @@ package net.hulan.ivr.block;
 
 import mtr.block.IBlock;
 import mtr.mappings.BlockEntityMapper;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockKCRStationNameEntrance extends BlockKCRStationNameBase {
 
-    public static final IntProperty STYLE = IntProperty.of("propagate_property", 0, 5);
+    public static final IntegerProperty STYLE = IntegerProperty.create("propagate_property", 0, 5);
 
     public BlockKCRStationNameEntrance() {
         super();
@@ -29,44 +31,44 @@ public class BlockKCRStationNameEntrance extends BlockKCRStationNameBase {
 
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand interactionHand, BlockHitResult blockHitResult) {
+    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, net.minecraft.world.phys.BlockHitResult blockHitResult) {
         return IBlock.checkHoldingBrush(world, player, () -> {
-            world.setBlockState(pos, state.cycle(STYLE));
-            this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYClockwise(), STYLE, 1);
-            this.propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).rotateYCounterclockwise(), STYLE, 1);
+            world.setBlockAndUpdate(pos, state.cycle(STYLE));
+            propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), STYLE, 1);
+            propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), STYLE, 1);
         });
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
         Direction facing = IBlock.getStatePropertySafe(state, FACING);
-        return world.getBlockState(pos.offset(facing)).getMaterial().isSolid();
+        return world.getBlockState(pos.relative(facing)).getMaterial().isSolid();
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction side = ctx.getSide();
-        return side != Direction.UP && side != Direction.DOWN ? this.getDefaultState().with(FACING, side.getOpposite()) : null;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState newState, WorldAccess world, BlockPos pos, BlockPos posFrom) {
-        return direction.getOpposite() == IBlock.getStatePropertySafe(state, FACING).getOpposite() && !state.canPlaceAt(world, pos) ? Blocks.AIR.getDefaultState() : state;
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        Direction side = ctx.getClickedFace();
+        return side != Direction.UP && side != Direction.DOWN ? defaultBlockState().setValue(FACING, side.getOpposite()) : null;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState newState, LevelAccessor world, BlockPos pos, BlockPos posFrom) {
+        return direction.getOpposite() == IBlock.getStatePropertySafe(state, FACING).getOpposite() && !state.canSurvive(world, pos) ? Blocks.AIR.defaultBlockState() : state;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public net.minecraft.world.phys.shapes.@NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
         boolean tall = IBlock.getStatePropertySafe(state, STYLE) % 2 == 1;
-        return IBlock.getVoxelShapeByDirection(0.0D, tall ? 0.0D : 4.0D, 0.0D, 16.0D, tall ? 16.0D : 12.0D, 1.0D, IBlock.getStatePropertySafe(state, FACING));
+        return IBlock.getVoxelShapeByDirection(0.0F, tall ? (double)0.0F : (double)4.0F, 0.0F, 16.0F, tall ? (double)16.0F : (double)12.0F, 1.0F, IBlock.getStatePropertySafe(state, FACING));
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getCollisionShape(BlockState blockState, BlockView blockGetter, BlockPos blockPos, ShapeContext collisionContext) {
-        return VoxelShapes.empty();
+    public net.minecraft.world.phys.shapes.@NotNull VoxelShape getCollisionShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+        return Shapes.empty();
     }
 
     @Override
@@ -74,8 +76,7 @@ public class BlockKCRStationNameEntrance extends BlockKCRStationNameBase {
         return new BlockKCRStationNameEntrance.TileEntityKCRStationNameEntrance(pos, state);
     }
 
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, STYLE);
     }
 

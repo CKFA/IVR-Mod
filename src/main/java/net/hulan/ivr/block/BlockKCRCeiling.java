@@ -4,7 +4,7 @@ import mtr.block.BlockCeiling;
 
 public class BlockKCRCeiling extends BlockCeiling {
 
-    public BlockKCRCeiling(Settings settings) {
+    public BlockKCRCeiling(Properties settings) {
         super(settings);
     }
 }

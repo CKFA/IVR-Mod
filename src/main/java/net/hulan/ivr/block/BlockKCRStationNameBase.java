@@ -5,35 +5,34 @@ import mtr.data.IGui;
 import mtr.mappings.BlockDirectionalMapper;
 import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.EntityBlockMapper;
+import mtr.mappings.Text;
 import net.hulan.ivr.IVRBlockEntityTypes;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 
 import java.util.List;
 
 public abstract class BlockKCRStationNameBase extends BlockDirectionalMapper implements EntityBlockMapper, IBlock, IVRBlockEntityTypes {
 
-    public static final IntProperty COLOR = IntProperty.of("color", 0, 2);
+    public static final IntegerProperty COLOR = IntegerProperty.create("color", 0, 2);
 
     public BlockKCRStationNameBase() {
-        super(AbstractBlock.Settings.of(Material.METAL, MapColor.GRAY).requiresTool().strength(2.0F).nonOpaque());
+        super(Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
     }
 
-
     @Override
-    public void appendTooltip(ItemStack itemStack, BlockView blockGetter, List<Text> tooltip, TooltipContext tooltipFlag) {
-        tooltip.add(mtr.mappings.Text.translatable("tooltip.mtr.station_color_name").setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+    public void appendHoverText(ItemStack itemStack, BlockGetter blockGetter, List<Component> tooltip, TooltipFlag tooltipFlag) {
+        tooltip.add(Text.translatable("tooltip.mtr.station_color_name").setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
     }
 
     @Override

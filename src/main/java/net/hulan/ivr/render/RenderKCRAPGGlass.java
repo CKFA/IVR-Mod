@@ -6,12 +6,12 @@ import mtr.render.RenderTrains;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockKCRAPGGlass;
 import net.hulan.ivr.client.IVRClientData;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 public class RenderKCRAPGGlass extends RenderKCRRouteBase<BlockKCRAPGGlass.TileEntityKCRAPGGlass> {
 
@@ -23,7 +23,7 @@ public class RenderKCRAPGGlass extends RenderKCRRouteBase<BlockKCRAPGGlass.TileE
     }
 
     @Override
-    protected RenderKCRRouteBase.RenderType getRenderType(BlockView world, BlockPos pos, BlockState state) {
+    protected RenderKCRRouteBase.RenderType getRenderType(BlockGetter world, BlockPos pos, BlockState state) {
         if (IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.LOWER) {
             return RenderKCRRouteBase.RenderType.NONE;
         } else {
@@ -40,16 +40,15 @@ public class RenderKCRAPGGlass extends RenderKCRRouteBase<BlockKCRAPGGlass.TileE
                 storedMatrixTransformations.transform(matrices);
                 IDrawing.drawTexture(matrices, vertexConsumer, isLeft ? this.sidePadding : 0.0F, 0.75F, 0.0F, isRight ? 1.0F - this.sidePadding : 1.0F, 0.78125F, 0.0F, facing, color, light);
                 IDrawing.drawTexture(matrices, vertexConsumer, isRight ? 1.0F - this.sidePadding : 1.0F, 0.75F, 0.125F, isLeft ? this.sidePadding : 0.0F, 0.78125F, 0.125F, facing, color, light);
-                matrices.pop();
+                matrices.popPose();
             });
             float width = (float)(leftBlocks + rightBlocks + 1) - this.sidePadding * 2.0F;
             float height = 1.0F - this.topPadding - this.bottomPadding;
             RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getSingleRowStationName(platformId, width / height).resourceLocation, false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
                 storedMatrixTransformations.transform(matrices);
                 IDrawing.drawTexture(matrices, vertexConsumer, 1.0F - (rightBlocks == 0 ? this.sidePadding : 0.0F), this.topPadding, 0.125F, leftBlocks == 0 ? this.sidePadding : 0.0F, 1.0F - this.bottomPadding, 0.125F, ((float)rightBlocks - (rightBlocks == 0 ? 0.0F : this.sidePadding)) / width, 0.0F, (width - (float)leftBlocks + (leftBlocks == 0 ? 0.0F : this.sidePadding)) / width, 1.0F, facing, color, light);
-                matrices.pop();
+                matrices.popPose();
             });
         }
-
     }
 }

@@ -2,7 +2,7 @@ package net.hulan.ivr;
 
 import mtr.RegistryObject;
 import net.hulan.ivr.item.ItemKCRPSDAPGBase;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public interface IVRItems {
     RegistryObject<Item> KCR_APG_DOOR = new RegistryObject<>(() -> new ItemKCRPSDAPGBase(ItemKCRPSDAPGBase.EnumKCRPSDAPGItem.PSD_APG_DOOR, ItemKCRPSDAPGBase.EnumKCRPSDAPGType.APG));

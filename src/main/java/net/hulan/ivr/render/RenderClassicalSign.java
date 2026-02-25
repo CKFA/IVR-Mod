@@ -3,6 +3,8 @@ package net.hulan.ivr.render;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import mtr.block.BlockStationNameBase;
 import mtr.block.IBlock;
 import mtr.client.ClientCache;
@@ -20,17 +22,15 @@ import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockClassicalSign;
 import net.hulan.ivr.client.IVRClientCache;
 import net.hulan.ivr.client.IVRClientData;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassicalSign> extends BlockEntityRendererMapper<T> implements IBlock, IGui, IDrawing {
 
@@ -39,13 +39,12 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
     }
 
     @Override
-    public void render(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        final BlockView world = entity.getWorld();
+    public void render(T entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        final BlockGetter world = entity.getLevel();
         if (world == null) {
             return;
         }
-
-        final BlockPos pos = entity.getPos();
+        final BlockPos pos = entity.getBlockPos();
         final BlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof final BlockClassicalSign block)) {
             return;
@@ -55,7 +54,6 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
         }
         final Direction facing = IBlock.getStatePropertySafe(state, BlockStationNameBase.FACING);
         final String[] signIds = entity.getSignIds();
-
         boolean renderBackground = false;
         int backgroundColor = 0;
         for (final String signId : signIds) {
@@ -70,27 +68,24 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                 }
             }
         }
-
         final StoredMatrixTransformations storedMatrixTransformations = new StoredMatrixTransformations();
         storedMatrixTransformations.add(matricesNew -> {
-            matricesNew.translate(0.5 + entity.getPos().getX(), 0.53125 + entity.getPos().getY(), 0.5 + entity.getPos().getZ());
-            UtilitiesClient.rotateYDegrees(matricesNew, -facing.asRotation());
+            matricesNew.translate(0.5 + entity.getBlockPos().getX(), 0.53125 + entity.getBlockPos().getY(), 0.5 + entity.getBlockPos().getZ());
+            UtilitiesClient.rotateYDegrees(matricesNew, -facing.toYRot());
             UtilitiesClient.rotateZDegrees(matricesNew, 180);
             matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.125D);
         });
-
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0.5, 0.53125, 0.5);
-        UtilitiesClient.rotateYDegrees(matrices, -facing.asRotation());
+        UtilitiesClient.rotateYDegrees(matrices, -facing.toYRot());
         UtilitiesClient.rotateZDegrees(matrices, 180);
         matrices.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2);
-
         if (renderBackground) {
             final int newBackgroundColor = backgroundColor | ARGB_BLACK;
-            RenderTrains.scheduleRender(new Identifier("mtr:textures/block/white.png"), false, RenderTrains.QueuedRenderLayer.INTERIOR, (matricesNew, vertexConsumer) -> {
+            RenderTrains.scheduleRender(new ResourceLocation("mtr:textures/block/white.png"), false, RenderTrains.QueuedRenderLayer.INTERIOR, (matricesNew, vertexConsumer) -> {
                 storedMatrixTransformations.transform(matricesNew);
                 IDrawing.drawTexture(matricesNew, vertexConsumer, 0, 0, SMALL_OFFSET, 0.5F * (signIds.length), 0.5F, SMALL_OFFSET, facing, newBackgroundColor, MAX_LIGHT_GLOWING);
-                matricesNew.pop();
+                matricesNew.popPose();
             });
         }
         for (int i = 0; i < signIds.length; i++) {
@@ -98,7 +93,7 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                 drawSign(matrices,
                         vertexConsumers,
                         storedMatrixTransformations,
-                        MinecraftClient.getInstance().textRenderer,
+                        Minecraft.getInstance().font,
                         pos,
                         signIds[i],
                         0.5F * i,
@@ -109,25 +104,25 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                         entity.getSelectedIds(),
                         facing,
                         backgroundColor | ARGB_BLACK,
-                        (textureId, x, y, size, flipTexture) -> RenderTrains.scheduleRender(new Identifier(textureId.toString()), true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
+                        (textureId, x, y, size, flipTexture) -> RenderTrains.scheduleRender(new ResourceLocation(textureId.toString()), true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
                             storedMatrixTransformations.transform(matricesNew);
                             IDrawing.drawTexture(matricesNew, vertexConsumer, x, y, size, size, flipTexture ? 1 : 0, 0, flipTexture ? 0 : 1, 1, facing, -1, MAX_LIGHT_GLOWING);
-                            matricesNew.pop();
+                            matricesNew.popPose();
                         }));
             }
         }
-        matrices.pop();
+        matrices.popPose();
     }
 
     @Override
-    public boolean rendersOutsideBoundingBox(T blockEntity) {
+    public boolean shouldRenderOffScreen(T blockEntity) {
         return true;
     }
 
-    public static void drawSign(MatrixStack matrices,
-                                VertexConsumerProvider vertexConsumers,
+    public static void drawSign(PoseStack matrices,
+                                MultiBufferSource vertexConsumers,
                                 StoredMatrixTransformations storedMatrixTransformations,
-                                TextRenderer textRenderer,
+                                Font font,
                                 BlockPos pos,
                                 String signId,
                                 float x,
@@ -142,15 +137,12 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
         if (RenderTrains.shouldNotRender(pos, RenderTrains.maxTrainRenderDistance, facing)) {
             return;
         }
-
         final CustomResources.CustomSign sign = getSign(signId);
         if (sign == null) {
             return;
         }
-
         final float signSize = (sign.small ? BlockClassicalSign.SMALL_SIGN_PERCENTAGE : 1) * size;
         final float margin = (size - signSize) / 2;
-
         final boolean hasCustomText = sign.hasCustomText();
         final boolean flipCustomText = sign.flipCustomText;
         final boolean flipTexture = sign.flipTexture;
@@ -158,64 +150,52 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
         final boolean isLine = signId.equals(BlockClassicalSign.SignType.LINE.toString()) || signId.equals(BlockClassicalSign.SignType.LINE_FLIPPED.toString());
         final boolean isPlatform = signId.equals(BlockClassicalSign.SignType.PLATFORM.toString()) || signId.equals(BlockClassicalSign.SignType.PLATFORM_FLIPPED.toString());
         final boolean isStation = signId.equals(BlockClassicalSign.SignType.STATION.toString()) || signId.equals(BlockClassicalSign.SignType.STATION_FLIPPED.toString());
-
-        final VertexConsumerProvider.Immediate immediate = RenderTrains.shouldNotRender(pos, RenderTrains.maxTrainRenderDistance / 2, null) ? null : VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-
+        final MultiBufferSource.BufferSource immediate = RenderTrains.shouldNotRender(pos, RenderTrains.maxTrainRenderDistance / 2, null) ? null : MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         if (vertexConsumers != null && isExit) {
             final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
             if (station == null) {
                 return;
             }
-
             final Map<String, List<String>> exits = station.getGeneratedExits();
             final List<String> selectedExitsSorted = selectedIds.stream().map(Station::deserializeExit).filter(exits::containsKey).sorted(String::compareTo).toList();
-
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(x + margin + (flipCustomText ? signSize : 0), y + margin, 0);
             final float maxWidth = ((flipCustomText ? maxWidthLeft : maxWidthRight) + 1) * size - margin * 2;
             final float exitWidth = signSize * selectedExitsSorted.size();
             matrices.scale(Math.min(1, maxWidth / exitWidth), 1, 1);
-
             for (int i = 0; i < selectedExitsSorted.size(); i++) {
                 final String selectedExit = selectedExitsSorted.get(flipCustomText ? selectedExitsSorted.size() - i - 1 : i);
                 final float offset = (flipCustomText ? -1 : 1) * signSize * i - (flipCustomText ? signSize : 0);
-
                 RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getExitSignLetter(selectedExit.substring(0, 1), selectedExit.substring(1), backgroundColor).resourceLocation, true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
                     storedMatrixTransformations.transform(matricesNew);
                     matricesNew.translate(x + margin + (flipCustomText ? signSize : 0), y + margin, 0);
                     matricesNew.scale(Math.min(1, maxWidth / exitWidth), 1, 1);
                     IDrawing.drawTexture(matricesNew, vertexConsumer, offset, 0, signSize, signSize, facing, MAX_LIGHT_GLOWING);
-                    matricesNew.pop();
+                    matricesNew.popPose();
                 });
-
                 if (maxWidth > exitWidth && selectedExitsSorted.size() == 1 && !exits.get(selectedExit).isEmpty()) {
                     renderCustomText(exits.get(selectedExit).get(0), storedMatrixTransformations, facing, size, flipCustomText ? x : x + size, flipCustomText, maxWidth - exitWidth - margin * 2, backgroundColor);
                 }
             }
-
-            matrices.pop();
+            matrices.popPose();
         } else if (vertexConsumers != null && isLine) {
             final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
             if (station == null) {
                 return;
             }
-
             final Map<Integer, ClientCache.ColorNameTuple> routesInStation = ClientData.DATA_CACHE.getAllRoutesIncludingConnectingStations(station);
             final List<ClientCache.ColorNameTuple> selectedIdsSorted = selectedIds.stream().filter(selectedId -> RailwayData.isBetween(selectedId, Integer.MIN_VALUE, Integer.MAX_VALUE)).map(Math::toIntExact).filter(routesInStation::containsKey).map(routesInStation::get).sorted(Comparator.comparingInt(route -> route.color)).toList();
-
             final float maxWidth = Math.max(0, ((flipCustomText ? maxWidthLeft : maxWidthRight) + 1) * size - margin * 2);
             final float height = size - margin * 2;
-            final List<ClientCache.DynamicResource> IdentifierDataList = new ArrayList<>();
+            final List<ClientCache.DynamicResource> ResourceLocationDataList = new ArrayList<>();
             float totalTextWidth = 0;
             for (final ClientCache.ColorNameTuple route : selectedIdsSorted) {
-                final ClientCache.DynamicResource IdentifierData = ClientData.DATA_CACHE.getRouteSquare(route.color, route.name, flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT);
-                IdentifierDataList.add(IdentifierData);
-                totalTextWidth += height * IdentifierData.width / IdentifierData.height + margin / 2F;
+                final ClientCache.DynamicResource ResourceLocationData = ClientData.DATA_CACHE.getRouteSquare(route.color, route.name, flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT);
+                ResourceLocationDataList.add(ResourceLocationData);
+                totalTextWidth += height * ResourceLocationData.width / ResourceLocationData.height + margin / 2F;
             }
-
             final StoredMatrixTransformations storedMatrixTransformations2 = storedMatrixTransformations.copy();
             storedMatrixTransformations2.add(matricesNew -> matricesNew.translate(flipCustomText ? x + size - margin : x + margin, 0, 0));
-
             if (totalTextWidth > margin / 2F) {
                 totalTextWidth -= margin / 2F;
             }
@@ -223,15 +203,14 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                 final float finalTotalTextWidth = totalTextWidth;
                 storedMatrixTransformations2.add(matricesNew -> matricesNew.scale(maxWidth / finalTotalTextWidth, 1, 1));
             }
-
             float xOffset = 0;
-            for (final ClientCache.DynamicResource IdentifierData : IdentifierDataList) {
-                final float width = height * IdentifierData.width / IdentifierData.height;
+            for (final ClientCache.DynamicResource ResourceLocationData : ResourceLocationDataList) {
+                final float width = height * ResourceLocationData.width / ResourceLocationData.height;
                 final float finalXOffset = xOffset;
-                RenderTrains.scheduleRender(IdentifierData.resourceLocation, true, RenderTrains.QueuedRenderLayer.INTERIOR, (matricesNew, vertexConsumer) -> {
+                RenderTrains.scheduleRender(ResourceLocationData.resourceLocation, true, RenderTrains.QueuedRenderLayer.INTERIOR, (matricesNew, vertexConsumer) -> {
                     storedMatrixTransformations2.transform(matricesNew);
                     IDrawing.drawTexture(matricesNew, vertexConsumer, flipCustomText ? -finalXOffset - width : finalXOffset, margin, width, height, Direction.UP, MAX_LIGHT_GLOWING);
-                    matricesNew.pop();
+                    matricesNew.popPose();
                 });
                 xOffset += width + margin / 2F;
             }
@@ -240,12 +219,10 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
             if (station == null) {
                 return;
             }
-
             final Map<Long, Platform> platformPositions = ClientData.DATA_CACHE.requestStationIdToPlatforms(station.id);
             if (platformPositions != null) {
                 final List<Long> selectedIdsSorted = selectedIds.stream().filter(platformPositions::containsKey).sorted(Comparator.comparing(platformPositions::get)).toList();
                 final int selectedCount = selectedIdsSorted.size();
-
                 final float extraMargin = margin - margin / selectedCount;
                 final float height = (size - extraMargin * 2) / selectedCount;
                 for (int i = 0; i < selectedIdsSorted.size(); i++) {
@@ -268,13 +245,12 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                             (matricesNew, vertexConsumer) -> {
                                 storedMatrixTransformations.transform(matricesNew);
                                 IDrawing.drawTexture(matricesNew, vertexConsumer, left, topOffset, 0, right, bottomOffset, 0, 0, 0, 1, 1, facing, -1, MAX_LIGHT_GLOWING);
-                                matricesNew.pop();
+                                matricesNew.popPose();
                             });
                 }
             }
         } else {
             drawTexture.drawTexture(sign.textureId, x + margin, y + margin, signSize, flipTexture);
-
             if (hasCustomText) {
                 final float fixedMargin = size * (1 - BlockClassicalSign.SMALL_SIGN_PERCENTAGE) / 2;
                 final boolean isSmall = sign.small;
@@ -282,7 +258,7 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                 final float start = flipCustomText ? x - (isSmall ? 0 : fixedMargin) : x + size + (isSmall ? 0 : fixedMargin);
                 if (vertexConsumers == null) {
                     IDrawing.drawStringWithFont(matrices,
-                            textRenderer,
+                            font,
                             immediate,
                             isExit || isLine ? "..." : sign.customText,
                             flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT,
@@ -307,9 +283,8 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
                 }
             }
         }
-
         if (immediate != null) {
-            immediate.draw();
+            immediate.endBatch();
         }
     }
 
@@ -319,7 +294,7 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
         RenderTrains.scheduleRender(dynamicResource.resourceLocation, true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
             storedMatrixTransformations.transform(matricesNew);
             IDrawing.drawTexture(matricesNew, vertexConsumer, start - (flipCustomText ? width : 0), 0, 0, start + (flipCustomText ? 0 : width), size, 0, 0, 0, 1, 1, facing, -1, MAX_LIGHT_GLOWING);
-            matricesNew.pop();
+            matricesNew.popPose();
         });
     }
 
@@ -344,12 +319,11 @@ public class RenderClassicalSign<T extends BlockClassicalSign.TileEntityClassica
             }
             maxWidthLeft++;
         }
-
         return maxWidthLeft;
     }
 
     @FunctionalInterface
     public interface DrawTexture {
-        void drawTexture(Identifier textureId, float x, float y, float size, boolean flipTexture);
+        void drawTexture(ResourceLocation textureId, float x, float y, float size, boolean flipTexture);
     }
 }

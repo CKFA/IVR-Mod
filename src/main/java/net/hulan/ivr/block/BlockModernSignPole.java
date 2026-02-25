@@ -2,37 +2,43 @@ package net.hulan.ivr.block;
 
 import mtr.block.BlockPoleCheckBase;
 import mtr.block.IBlock;
+import mtr.mappings.Text;
 import net.hulan.ivr.IVRBlocks;
-import net.minecraft.block.*;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public class BlockModernSignPole extends BlockPoleCheckBase {
 
-    public static final IntProperty TYPE = IntProperty.of("type", 0, 4);
+    public static final IntegerProperty TYPE = IntegerProperty.create("type", 0, 4);
 
     public BlockModernSignPole() {
-        super(AbstractBlock.Settings.of(Material.METAL).requiresTool().strength(1).nonOpaque());
+        super(BlockBehaviour.Properties.of(Material.METAL).requiresCorrectToolForDrops().strength(1).noOcclusion());
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView blockGetter, BlockPos pos, ShapeContext collisionContext) {
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
         Direction facing = IBlock.getStatePropertySafe(state, FACING);
-        final VoxelShape poleL = IBlock.getVoxelShapeByDirection(6.25, 0, 7.5, 7.25, 16, 8.5, facing), poleR = IBlock.getVoxelShapeByDirection(8.75, 0, 7.5, 9.75, 16, 8.5, facing);
+        final VoxelShape poleL = IBlock.getVoxelShapeByDirection(6.25, 0, 7.5, 7.25, 16, 8.5, facing), poleR = IBlock.getVoxelShapeByDirection(0, 0, 7.5, 9.755, 16, 8.5, facing);
         return switch (IBlock.getStatePropertySafe(state, TYPE)) {
             case 0 -> IBlock.getVoxelShapeByDirection(18.5, 0, 7.5, 19.5, 16, 8.5, facing);
             case 1 -> IBlock.getVoxelShapeByDirection(14, 0, 7.5, 15, 16, 8.5, facing);
-            case 2 -> IBlock.getVoxelShapeByDirection(10.25, 0, 7.5, 11.25, 16, 8.5, facing);
+            case 2 -> IBlock.getVoxelShapeByDirection(9.25, 0, 7.5, 10.25, 16, 8.5, facing);
             case 3 -> IBlock.getVoxelShapeByDirection(6.25, 0, 7.5, 7.25, 16, 8.5, facing);
-            case 4 -> VoxelShapes.union(poleL, poleR);
-            default -> VoxelShapes.fullCube();
+            case 4 -> Shapes.or(poleL, poleR);
+            default -> Shapes.block();
         };
     }
 
@@ -50,12 +56,12 @@ public class BlockModernSignPole extends BlockPoleCheckBase {
             type = IBlock.getStatePropertySafe(stateBelow, TYPE);
         }
 
-        return super.placeWithState(stateBelow).with(TYPE, type);
+        return super.placeWithState(stateBelow).setValue(TYPE, type);
     }
 
     @Override
-    public String getTranslationKey() {
-        return "block.ivr.modern_sign_pole";
+    public @NotNull String getDescriptionId() {
+        return "block.ivr.Modern_sign_pole";
     }
 
     @Override
@@ -64,12 +70,12 @@ public class BlockModernSignPole extends BlockPoleCheckBase {
     }
 
     @Override
-    protected Text getTooltipBlockText() {
-        return mtr.mappings.Text.translatable("block.mtr.railway_sign");
+    protected Component getTooltipBlockText() {
+        return Text.translatable("block.mtr.railway_sign");
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, TYPE);
     }
 }
