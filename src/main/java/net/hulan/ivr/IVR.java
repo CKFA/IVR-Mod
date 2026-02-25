@@ -110,9 +110,9 @@ public class IVR implements ModInitializer, IVRPacket, IVRBlocks, IVRBlockEntity
         registerBlock.accept("modern_sign_middle", MODERN_SIGN_MIDDLE);
         registerBlockItem.accept("modern_sign_pole", MODERN_SIGN_POLE, IVR_);
         registerBlockItem.accept("kcr_station_wall", KCR_STATION_WALL, IVR_);
-        registerBlockItem.accept("kcr_station_wall_yellow", KCR_STATION_WALL_YELLOW, IVR_);
+        //registerBlockItem.accept("kcr_station_wall_yellow", KCR_STATION_WALL_YELLOW, IVR_);
         registerBlockItem.accept("kcr_station_wall_slab", KCR_STATION_WALL_SLAB, IVR_);
-        registerBlockItem.accept("kcr_station_wall_yellow_slab", KCR_STATION_WALL_YELLOW_SLAB, IVR_);
+        //registerBlockItem.accept("kcr_station_wall_yellow_slab", KCR_STATION_WALL_YELLOW_SLAB, IVR_);
         registerEnchantedBlockItem.accept("kcr_station_color_station_wall", KCR_STATION_COLOR_STATION_WALL, IVR_);
         registerEnchantedBlockItem.accept("kcr_station_color_station_wall_slab", KCR_STATION_COLOR_STATION_WALL_SLAB, IVR_);
         registerBlockItem.accept("modern_route_sign", MODERN_ROUTE, IVR_);

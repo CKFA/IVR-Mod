@@ -151,7 +151,7 @@ public class BlockModernSign extends BlockDirectionalMapper implements EntityBlo
 
     @Override
     public @NotNull String getDescriptionId() {
-        return "block.ivr.MODERN_sign";
+        return "block.ivr.modern_sign";
     }
 
     @Override
