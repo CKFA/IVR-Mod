@@ -73,7 +73,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
             matricesNew.translate(0.5 + entity.getBlockPos().getX(), 0.53125 + entity.getBlockPos().getY(), 0.5 + entity.getBlockPos().getZ());
             UtilitiesClient.rotateYDegrees(matricesNew, -facing.toYRot());
             UtilitiesClient.rotateZDegrees(matricesNew, 180);
-            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2 - 0.125D);
+            matricesNew.translate(block.getXStart() / 16F - 0.5, 0, -0.0625 - SMALL_OFFSET * 2);
         });
         matrices.pushPose();
         matrices.translate(0.5, 0.53125, 0.5);
