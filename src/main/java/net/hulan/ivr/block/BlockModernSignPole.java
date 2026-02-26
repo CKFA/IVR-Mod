@@ -61,7 +61,7 @@ public class BlockModernSignPole extends BlockPoleCheckBase {
 
     @Override
     public @NotNull String getDescriptionId() {
-        return "block.ivr.Modern_sign_pole";
+        return "block.ivr.modern_sign_pole";
     }
 
     @Override
