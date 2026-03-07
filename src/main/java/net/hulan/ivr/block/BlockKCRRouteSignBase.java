@@ -46,7 +46,7 @@ public abstract class BlockKCRRouteSignBase extends BlockDirectionalDoubleBlockB
                 propagate(world, pos, Direction.DOWN, ARROW_DIRECTION, 1);
             } else {
                 BlockEntity entity = world.getBlockEntity(pos.below(isUpper ? 1 : 0));
-                if (entity instanceof BlockKCRRouteSignBase.TileEntityKCRRouteSignBase) {
+                if (entity instanceof TileEntityKCRRouteSignBase) {
                     IVRPacketTrainDataGuiServer.openModernSignScreenS2C((ServerPlayer)player, entity.getBlockPos());
                 }
             }

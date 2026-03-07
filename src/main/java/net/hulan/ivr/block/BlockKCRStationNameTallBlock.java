@@ -33,10 +33,10 @@ public class BlockKCRStationNameTallBlock extends BlockKCRStationNameTallBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRStationNameTallBlock.TileEntityKCRStationNameTallBlock(pos, state);
+        return new TileEntityKCRStationNameTallBlock(pos, state);
     }
 
-    public static class TileEntityKCRStationNameTallBlock extends BlockKCRStationNameTallBase.TileEntityKCRStationNameTallBase {
+    public static class TileEntityKCRStationNameTallBlock extends TileEntityKCRStationNameTallBase {
 
         public TileEntityKCRStationNameTallBlock(BlockPos pos, BlockState state) {
             super(KCR_STATION_NAME_TALL_BLOCK_TILE_ENTITY.get(), pos, state, 0.6875F, false);

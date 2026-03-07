@@ -44,7 +44,7 @@ public class BlockKCRAPGGlass extends BlockPSDAPGGlassBase implements EntityBloc
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRAPGGlass.TileEntityKCRAPGGlass(pos, state);
+        return new TileEntityKCRAPGGlass(pos, state);
     }
 
     @Override

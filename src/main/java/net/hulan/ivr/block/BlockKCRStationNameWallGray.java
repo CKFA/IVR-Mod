@@ -8,7 +8,7 @@ public class BlockKCRStationNameWallGray extends BlockKCRStationNameWallBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRStationNameWallGray.TileEntityKCRStationNameWallGray(pos, state);
+        return new TileEntityKCRStationNameWallGray(pos, state);
     }
 
     public static class TileEntityKCRStationNameWallGray extends TileEntityKCRStationNameWallBase {

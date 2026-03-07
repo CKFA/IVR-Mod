@@ -73,14 +73,14 @@ public class BlockKCRStationNameEntrance extends BlockKCRStationNameBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRStationNameEntrance.TileEntityKCRStationNameEntrance(pos, state);
+        return new TileEntityKCRStationNameEntrance(pos, state);
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, STYLE);
     }
 
-    public static class TileEntityKCRStationNameEntrance extends BlockKCRStationNameBase.TileEntityKCRStationNameBase {
+    public static class TileEntityKCRStationNameEntrance extends TileEntityKCRStationNameBase {
         public TileEntityKCRStationNameEntrance(BlockPos pos, BlockState state) {
             super(KCR_STATION_NAME_ENTRANCE_TILE_ENTITY.get(), pos, state, 0.0F, 0.00625F, false);
         }

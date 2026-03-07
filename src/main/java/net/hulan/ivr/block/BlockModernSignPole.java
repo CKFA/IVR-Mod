@@ -24,7 +24,7 @@ public class BlockModernSignPole extends BlockPoleCheckBase {
     public static final IntegerProperty TYPE = IntegerProperty.create("type", 0, 4);
 
     public BlockModernSignPole() {
-        super(BlockBehaviour.Properties.of(Material.METAL).requiresCorrectToolForDrops().strength(1).noOcclusion());
+        super(Properties.of(Material.METAL).requiresCorrectToolForDrops().strength(1).noOcclusion());
     }
 
     @SuppressWarnings("deprecation")

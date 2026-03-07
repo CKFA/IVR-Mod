@@ -1,10 +1,7 @@
 package net.hulan.ivr;
 
 import mtr.RegistryClient;
-import mtr.client.ClientData;
-import mtr.data.Depot;
-import mtr.data.Route;
-import mtr.data.Station;
+import mtr.packet.IPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.hulan.ivr.packet.IVRPacket;
 import net.hulan.ivr.packet.IVRPacketTrainDataGuiClient;
@@ -13,7 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 
 @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
-public class IVRClient implements ClientModInitializer, IVRPacket, IVRBlockEntityTypes, IVRBlocks {
+public class IVRClient implements ClientModInitializer, IVRPacket, IVRBlockEntityTypes, IVRBlocks, IPacket {
 
     @Override
     public void onInitializeClient() {
@@ -79,17 +76,5 @@ public class IVRClient implements ClientModInitializer, IVRPacket, IVRBlockEntit
         RegistryClient.registerNetworkReceiver(PACKET_OPEN_CLASSICAL_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openClassicalSignScreenS2C(Minecraft.getInstance(), packet));
         RegistryClient.registerNetworkReceiver(PACKET_OPEN_CLASSICAL_1ODD_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openClassicalSign1OddScreenS2C(Minecraft.getInstance(), packet));
         RegistryClient.registerNetworkReceiver(PACKET_OPEN_MODERN_SIGN_SCREEN, packet -> IVRPacketTrainDataGuiClient.openModernSignScreenS2C(Minecraft.getInstance(), packet));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_CHUNK_S2C, (packet) -> IVRPacketTrainDataGuiClient.receiveChunk(Minecraft.getInstance(), packet));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_STATION, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.STATIONS, ClientData.DATA_CACHE.stationIdMap, (id, transportMode) -> new Station(id), false));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_PLATFORM, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.PLATFORMS, ClientData.DATA_CACHE.platformIdMap, null, false));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_SIDING, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.SIDINGS, ClientData.DATA_CACHE.sidingIdMap, null, false));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_ROUTE, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.ROUTES, ClientData.DATA_CACHE.routeIdMap, Route::new, false));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_DEPOT, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.DEPOTS, ClientData.DATA_CACHE.depotIdMap, Depot::new, false));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_DELETE_STATION, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.STATIONS, ClientData.DATA_CACHE.stationIdMap, (id, transportMode) -> new Station(id), true));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_DELETE_PLATFORM, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.PLATFORMS, ClientData.DATA_CACHE.platformIdMap, null, true));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_DELETE_SIDING, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.SIDINGS, ClientData.DATA_CACHE.sidingIdMap, null, true));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_DELETE_ROUTE, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.ROUTES, ClientData.DATA_CACHE.routeIdMap, Route::new, true));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_DELETE_DEPOT, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.DEPOTS, ClientData.DATA_CACHE.depotIdMap, Depot::new, true));
-        RegistryClient.registerNetworkReceiver(PACKET_IVR_UPDATE_LIFT, (packet) -> IVRPacketTrainDataGuiClient.receiveUpdateOrDeleteS2C(Minecraft.getInstance(), packet, ClientData.LIFTS, ClientData.DATA_CACHE.liftsClientIdMap, null, false));
     }
 }

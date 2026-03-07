@@ -20,22 +20,22 @@ public class BlockKCRStationNameTallBlockDoubleSided extends BlockKCRStationName
 
     @SuppressWarnings("deprecation")
     @Override
-    public @NotNull net.minecraft.world.phys.shapes.VoxelShape getShape(net.minecraft.world.level.block.state.BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
+    public @NotNull net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
         Tuple<Integer, Integer> bounds = getBounds(state);
         return Shapes.or(IBlock.getVoxelShapeByDirection(2.0F, (double) bounds.getA(), 5.0F, 14.0F, (double) bounds.getB(), 11.0F, IBlock.getStatePropertySafe(state, FACING)), BlockStationColorPole.getStationPoleShape());
     }
 
     @Override
-    public net.minecraft.world.level.block.state.BlockState getStateForPlacement(BlockPlaceContext ctx) {
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return IBlock.isReplaceable(ctx, Direction.UP, 3) ? defaultBlockState().setValue(FACING, ctx.getHorizontalDirection()).setValue(METAL, true).setValue(THIRD, EnumThird.LOWER) : null;
     }
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRStationNameTallBlockDoubleSided.TileEntityKCRStationNameTallBlockDoubleSided(pos, state);
+        return new TileEntityKCRStationNameTallBlockDoubleSided(pos, state);
     }
 
-    public static class TileEntityKCRStationNameTallBlockDoubleSided extends BlockKCRStationNameTallBase.TileEntityKCRStationNameTallBase {
+    public static class TileEntityKCRStationNameTallBlockDoubleSided extends TileEntityKCRStationNameTallBase {
 
         public TileEntityKCRStationNameTallBlockDoubleSided(BlockPos pos, BlockState state) {
             super(KCR_STATION_NAME_TALL_BLOCK_DOUBLE_SIDED_TILE_ENTITY.get(), pos, state, 0.6875F, true);

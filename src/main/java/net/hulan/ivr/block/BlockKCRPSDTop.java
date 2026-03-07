@@ -48,7 +48,7 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
     public static final BooleanProperty AIR_LEFT = BooleanProperty.create("air_left");
     public static final BooleanProperty AIR_RIGHT = BooleanProperty.create("air_right");
     public static final IntegerProperty ARROW_DIRECTION = IntegerProperty.create("propagate_property", 0, 3);
-    public static final EnumProperty<EnumPersistent> PERSISTENT = EnumProperty.create("persistent", BlockKCRPSDTop.EnumPersistent.class);
+    public static final EnumProperty<EnumPersistent> PERSISTENT = EnumProperty.create("persistent", EnumPersistent.class);
 
     public BlockKCRPSDTop() {
         super(Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(2.0F).noOcclusion());
@@ -63,7 +63,7 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
                 propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), ARROW_DIRECTION, 1);
                 propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), ARROW_DIRECTION, 1);
             } else {
-                boolean shouldBePersistent = IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE;
+                boolean shouldBePersistent = IBlock.getStatePropertySafe(state, PERSISTENT) == EnumPersistent.NONE;
                 setState(world, pos, shouldBePersistent);
                 propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), (offsetPos) -> setState(world, offsetPos, shouldBePersistent), 1);
                 propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getCounterClockWise(), (offsetPos) -> setState(world, offsetPos, shouldBePersistent), 1);
@@ -75,9 +75,9 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
         Block blockBelow = world.getBlockState(pos.below()).getBlock();
         if (blockBelow instanceof BlockKCRPSDDoor || blockBelow instanceof BlockKCRPSDGlass || blockBelow instanceof BlockKCRPSDGlassEnd) {
             if (shouldBePersistent) {
-                world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(PERSISTENT, blockBelow instanceof BlockKCRPSDDoor ? BlockKCRPSDTop.EnumPersistent.ARROW : (blockBelow instanceof BlockKCRPSDGlass ? BlockKCRPSDTop.EnumPersistent.ROUTE : BlockKCRPSDTop.EnumPersistent.BLANK)));
+                world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(PERSISTENT, blockBelow instanceof BlockKCRPSDDoor ? EnumPersistent.ARROW : (blockBelow instanceof BlockKCRPSDGlass ? EnumPersistent.ROUTE : EnumPersistent.BLANK)));
             } else {
-                world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(PERSISTENT, BlockKCRPSDTop.EnumPersistent.NONE));
+                world.setBlockAndUpdate(pos, world.getBlockState(pos).setValue(PERSISTENT, EnumPersistent.NONE));
             }
         }
     }
@@ -110,13 +110,13 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
     @SuppressWarnings("deprecation")
     @Override
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState newState, LevelAccessor world, BlockPos pos, BlockPos posFrom) {
-        return direction == Direction.DOWN && IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE && !(newState.getBlock() instanceof BlockPSDAPGBase) ? Blocks.AIR.defaultBlockState() : getActualState(world, pos);
+        return direction == Direction.DOWN && IBlock.getStatePropertySafe(state, PERSISTENT) == EnumPersistent.NONE && !(newState.getBlock() instanceof BlockPSDAPGBase) ? Blocks.AIR.defaultBlockState() : getActualState(world, pos);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
-        VoxelShape baseShape = IBlock.getVoxelShapeByDirection(0.0D, IBlock.getStatePropertySafe(state, PERSISTENT) == BlockKCRPSDTop.EnumPersistent.NONE ? 0.0D : 7.5D, 0.0D, 16.0D, 16.0D, 6.0D, IBlock.getStatePropertySafe(state, FACING));
+        VoxelShape baseShape = IBlock.getVoxelShapeByDirection(0.0D, IBlock.getStatePropertySafe(state, PERSISTENT) == EnumPersistent.NONE ? 0.0D : 7.5D, 0.0D, 16.0D, 16.0D, 6.0D, IBlock.getStatePropertySafe(state, FACING));
         boolean airLeft = IBlock.getStatePropertySafe(state, AIR_LEFT);
         boolean airRight = IBlock.getStatePropertySafe(state, AIR_RIGHT);
         return !airLeft && !airRight ? baseShape : BlockPSDAPGGlassEndBase.getEndOutlineShape(baseShape, state, 16, 6, airLeft, airRight);
@@ -190,7 +190,7 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
         }
     }
 
-    public static class TileEntityKCRPSDTop extends BlockKCRPSDTop.TileEntityKCRRouteBase {
+    public static class TileEntityKCRPSDTop extends TileEntityKCRRouteBase {
         public TileEntityKCRPSDTop(BlockPos pos, BlockState state) {
             super(IVRBlockEntityTypes.KCR_PSD_TOP_TILE_ENTITY.get(), pos, state);
         }

@@ -59,7 +59,7 @@ public abstract class BlockKCRStationNameWallBase extends BlockKCRStationNameBas
         builder.add(FACING);
     }
 
-    public abstract static class TileEntityKCRStationNameWallBase extends BlockKCRStationNameBase.TileEntityKCRStationNameBase {
+    public abstract static class TileEntityKCRStationNameWallBase extends TileEntityKCRStationNameBase {
 
         public TileEntityKCRStationNameWallBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
             super(type, pos, state, 0.0F, 0.0F, false);

@@ -5,9 +5,7 @@ import mtr.Registry;
 import mtr.data.*;
 import mtr.mappings.BlockEntityMapper;
 import mtr.packet.PacketTrainDataBase;
-import mtr.packet.UpdateBlueMap;
-import mtr.packet.UpdateDynmap;
-import mtr.packet.UpdateSquaremap;
+import net.hulan.ivr.IVR;
 import net.hulan.ivr.block.BlockClassicalSign;
 import net.hulan.ivr.block.BlockKCRRouteSignBase;
 import net.hulan.ivr.block.BlockModernSign;
@@ -21,9 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements IVRPacket {
 
@@ -152,99 +148,6 @@ public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements 
             final CompoundTag compoundTagNew = new CompoundTag();
             entities[0].writeCompoundTag(compoundTagNew);
             railwayData.railwayDataLoggingModule.addEvent(player, entities[0].getClass(), RailwayDataLoggingModule.getData(compoundTagOld), RailwayDataLoggingModule.getData(compoundTagNew), blockPos);
-        }
-    }
-
-    public static void sendAllInChunks(ServerPlayer player, Set<Station> stations, Set<Platform> platforms, Set<Siding> sidings, Set<Route> routes, Set<Depot> depots, Set<LiftServer> lifts) {
-        long tempPacketId = new Random().nextLong();
-        FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
-        serializeData(packet, stations);
-        serializeData(packet, platforms);
-        serializeData(packet, sidings);
-        serializeData(packet, routes);
-        serializeData(packet, depots);
-        serializeData(packet, lifts);
-        int i = 0;
-        while (!sendChunk(player, packet, tempPacketId, i)) {
-            ++i;
-        }
-    }
-
-    private static <T extends SerializedDataBase> void serializeData(FriendlyByteBuf packet, Collection<T> objects) {
-        packet.writeInt(objects.size());
-        objects.forEach((object) -> object.writePacket(packet));
-    }
-
-    private static boolean sendChunk(ServerPlayer player, FriendlyByteBuf packet, long tempPacketId, int chunk) {
-        FriendlyByteBuf packetChunk = new FriendlyByteBuf(Unpooled.buffer());
-        packetChunk.writeLong(tempPacketId);
-        packetChunk.writeInt(chunk);
-        boolean success = chunk * PACKET_CHUNK_SIZE > packet.readableBytes();
-        packetChunk.writeBoolean(success);
-        if (!success) {
-            packetChunk.writeBytes(packet.copy(chunk * PACKET_CHUNK_SIZE, Math.min(PACKET_CHUNK_SIZE, packet.readableBytes() - chunk * PACKET_CHUNK_SIZE)));
-        }
-        try {
-            Registry.sendToPlayer(player, PACKET_IVR_CHUNK_S2C, packetChunk);
-        } catch (Exception var8) {
-            var8.printStackTrace();
-        }
-        return success;
-    }
-
-    public static <T extends NameColorDataBase> void receiveUpdateOrDeleteC2S(MinecraftServer minecraftServer, ServerPlayer player, FriendlyByteBuf packet, ResourceLocation packetId, Function<RailwayData, Set<T>> dataSet, Function<RailwayData, Map<Long, T>> cacheMap, BiFunction<Long, TransportMode, T> createDataWithId, boolean isDelete) {
-        if (!RailwayData.hasNoPermission(player)) {
-            Level level = player.level;
-            RailwayData railwayData = RailwayData.getInstance(level);
-            if (railwayData != null) {
-                PacketCallback packetCallback = (updatePacket, fullPacket) -> {
-                    level.players().forEach((levelPlayer) -> {
-                        if (!levelPlayer.getUUID().equals(player.getUUID())) {
-                            Registry.sendToPlayer((ServerPlayer)levelPlayer, packetId, fullPacket);
-                        }
-                    });
-                    if (packetId.equals(PACKET_IVR_UPDATE_STATION) || packetId.equals(PACKET_IVR_DELETE_STATION) || packetId.equals(PACKET_IVR_UPDATE_DEPOT) || packetId.equals(PACKET_IVR_DELETE_DEPOT)) {
-                        try {
-                            UpdateDynmap.updateDynmap(level, railwayData);
-                        } catch (Exception | NoClassDefFoundError ignored) {
-                        }
-                        try {
-                            UpdateBlueMap.updateBlueMap(level, railwayData);
-                        } catch (Exception | NoClassDefFoundError ignored) {
-                        }
-                        try {
-                            UpdateSquaremap.updateSquaremap(level, railwayData);
-                        } catch (Exception | NoClassDefFoundError ignored) {
-                        }
-                    }
-                };
-                if (isDelete) {
-                    deleteData(dataSet.apply(railwayData),
-                            cacheMap.apply(railwayData),
-                            minecraftServer,
-                            packet,
-                            packetCallback,
-                            (data) -> railwayData.railwayDataLoggingModule.addEvent(player,
-                                    data.getClass(),
-                                    data.id,
-                                    data.name,
-                                    RailwayDataLoggingModule.getData(data),
-                                    new ArrayList<>()));
-                } else {
-                    updateData(dataSet.apply(railwayData),
-                            cacheMap.apply(railwayData),
-                            minecraftServer,
-                            packet,
-                            packetCallback,
-                            createDataWithId,
-                            (data, oldData) -> railwayData.railwayDataLoggingModule.addEvent(player,
-                                    data.getClass(),
-                                    data.id,
-                                    data.name,
-                                    oldData,
-                                    RailwayDataLoggingModule.getData(data)));
-                }
-            }
         }
     }
 }

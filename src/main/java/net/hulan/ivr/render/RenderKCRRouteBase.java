@@ -66,13 +66,13 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
                     int leftBlocks = this.getTextureNumber(world, pos, facing, true);
                     int rightBlocks = this.getTextureNumber(world, pos, facing, false);
                     int color = getShadingColor(facing, -1);
-                    RenderKCRRouteBase.RenderType renderType = this.getRenderType(world, pos.relative(facing.getCounterClockWise(), leftBlocks), state);
-                    if ((renderType == RenderKCRRouteBase.RenderType.ARROW || renderType == RenderKCRRouteBase.RenderType.ROUTE) && IBlock.getStatePropertySafe(state, SIDE_EXTENDED) != EnumSide.SINGLE) {
+                    RenderType renderType = this.getRenderType(world, pos.relative(facing.getCounterClockWise(), leftBlocks), state);
+                    if ((renderType == RenderType.ARROW || renderType == RenderType.ROUTE) && IBlock.getStatePropertySafe(state, SIDE_EXTENDED) != EnumSide.SINGLE) {
                         float width = (float)(leftBlocks + rightBlocks + 1) - this.sidePadding * 2.0F;
                         float height = 1.0F - this.topPadding - this.bottomPadding;
                         int arrowDirection = IBlock.getStatePropertySafe(state, this.arrowDirectionProperty);
                         ResourceLocation resourceLocation;
-                        if (renderType == RenderKCRRouteBase.RenderType.ARROW) {
+                        if (renderType == RenderType.ARROW) {
                             resourceLocation = IVRClientData.DATA_CACHE.getDirectionArrow(
                                     platformId,
                                     (arrowDirection & 1) > 0,
@@ -124,7 +124,7 @@ public abstract class RenderKCRRouteBase <T extends BlockKCRPSDTop.TileEntityKCR
         return IBlock.getStatePropertySafe(state, SIDE_EXTENDED) == EnumSide.RIGHT;
     }
 
-    protected abstract RenderKCRRouteBase.RenderType getRenderType(BlockGetter var1, BlockPos var2, BlockState var3);
+    protected abstract RenderType getRenderType(BlockGetter var1, BlockPos var2, BlockState var3);
 
     protected abstract void renderAdditional(StoredMatrixTransformations var1, long var2, BlockState var4, int var5, int var6, Direction var7, int var8, int var9);
 

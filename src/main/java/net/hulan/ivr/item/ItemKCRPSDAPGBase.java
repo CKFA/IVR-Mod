@@ -29,10 +29,10 @@ import java.util.List;
 
 public class ItemKCRPSDAPGBase extends ItemWithCreativeTabBase implements IBlock, IVRBlocks {
     
-    private final ItemKCRPSDAPGBase.EnumKCRPSDAPGItem item;
-    private final ItemKCRPSDAPGBase.EnumKCRPSDAPGType type;
+    private final EnumKCRPSDAPGItem item;
+    private final EnumKCRPSDAPGType type;
 
-    public ItemKCRPSDAPGBase(ItemKCRPSDAPGBase.EnumKCRPSDAPGItem item, ItemKCRPSDAPGBase.EnumKCRPSDAPGType type) {
+    public ItemKCRPSDAPGBase(EnumKCRPSDAPGItem item, EnumKCRPSDAPGType type) {
         super(IVRCreativeModTabs.IVR_);
         this.item = item;
         this.type = type;

@@ -19,7 +19,7 @@ public class BlockKCRPSDDoor extends BlockPSDAPGDoorBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRPSDDoor.TileEntityKCRPSDDoor(style, pos, state);
+        return new TileEntityKCRPSDDoor(style, pos, state);
     }
 
     @Override

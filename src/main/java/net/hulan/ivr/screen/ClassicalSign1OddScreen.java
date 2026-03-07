@@ -229,7 +229,7 @@ public class ClassicalSign1OddScreen extends ScreenMapper implements IGui {
         editingIndex = -1;
     }
 
-    private int loopSigns(ClassicalSign1OddScreen.LoopSignsCallback loopSignsCallback, boolean ignorePage) {
+    private int loopSigns(LoopSignsCallback loopSignsCallback, boolean ignorePage) {
         int pageCount = rows * columns;
         int indexSmall = 0;
         int indexBig = 0;

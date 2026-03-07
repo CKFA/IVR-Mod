@@ -769,7 +769,7 @@ public class IVRRouteMapGenerator implements IGui {
         IDrawing.drawTexture(matrices, vertexConsumer, Math.max(x, 0.0F), 0.0F, (float)imageWidth * scale + Math.min(x, 0.0F), availableHeight, Math.max(-x, 0.0F) / (float)imageWidth / scale, (float)row / (float)rows, 1.0F, (float)(row + 1) / (float)rows, Direction.UP, -1, 15728880);
     }
 
-    private static void setup(List<Map<Integer, IVRRouteMapGenerator.StationPosition>> stationPositions, List<List<Long>> stationsIdLists, int[] colorIndices, float[] bounds, boolean passed, boolean reverse) {
+    private static void setup(List<Map<Integer, StationPosition>> stationPositions, List<List<Long>> stationsIdLists, int[] colorIndices, float[] bounds, boolean passed, boolean reverse) {
         int passedMultiplier = passed ? -1 : 1;
         int reverseMultiplier = reverse ? -1 : 1;
         bounds[0] = 0.0F;
@@ -808,7 +808,7 @@ public class IVRRouteMapGenerator implements IGui {
                         float stationY1 = (float)routesIndicesInSection.indexOf(routeIndex) - (float)(routesIndicesInSection.size() - 1) / 2.0F + getLineOffset(routeIndex, colorIndices);
                         bounds[1] = Math.min(bounds[1], stationY1);
                         bounds[2] = Math.max(bounds[2], stationY1);
-                        stationPositions.get(routeIndex).put(passedMultiplier * (j + traverseIndex[routeIndex] + 1), new IVRRouteMapGenerator.StationPosition((float)reverseMultiplier * stationX / 2.0F, stationY1, false));
+                        stationPositions.get(routeIndex).put(passedMultiplier * (j + traverseIndex[routeIndex] + 1), new StationPosition((float)reverseMultiplier * stationX / 2.0F, stationY1, false));
                     }
                     traverseIndex[routeIndex] += intermediateSegmentsCounts[routeIndex];
                 }
@@ -819,7 +819,7 @@ public class IVRRouteMapGenerator implements IGui {
                     stationY = getLineOffset(routeIndex, colorIndices);
                     bounds[1] = Math.min(bounds[1], stationY);
                     bounds[2] = Math.max(bounds[2], stationY);
-                    stationPositions.get(routeIndex).put(passedMultiplier * traverseIndex[routeIndex], new IVRRouteMapGenerator.StationPosition((float)(reverseMultiplier * positionXOffset) / 2.0F, stationY, true));
+                    stationPositions.get(routeIndex).put(passedMultiplier * traverseIndex[routeIndex], new StationPosition((float)(reverseMultiplier * positionXOffset) / 2.0F, stationY, true));
                 }
                 bounds[0] = (float)positionXOffset / 2.0F;
             }
@@ -866,7 +866,7 @@ public class IVRRouteMapGenerator implements IGui {
         return interChangeRoutes == null ? new HashMap<>() : interChangeRoutes;
     }
 
-    private static void drawLine(NativeImage nativeImage, IVRRouteMapGenerator.StationPosition stationPosition1, IVRRouteMapGenerator.StationPosition stationPosition2, float widthScale, float heightScale, float xOffset, float yOffset, int color) {
+    private static void drawLine(NativeImage nativeImage, StationPosition stationPosition1, StationPosition stationPosition2, float widthScale, float heightScale, float xOffset, float yOffset, int color) {
         int x1 = Math.round((stationPosition1.x + xOffset) * (float)scale * widthScale);
         int x2 = Math.round((stationPosition2.x + xOffset) * (float)scale * widthScale);
         int y1 = Math.round((stationPosition1.y + yOffset) * (float)scale * heightScale);

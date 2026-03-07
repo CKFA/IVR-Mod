@@ -8,6 +8,6 @@ import net.minecraft.world.level.material.MaterialColor;
 public class BlockKCRCeilingAuto extends BlockCeilingAuto {
 
     public BlockKCRCeilingAuto() {
-        super(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(2.0F).lightLevel((state) -> 15));
+        super(Properties.of(Material.METAL, MaterialColor.QUARTZ).requiresCorrectToolForDrops().strength(2.0F).lightLevel((state) -> 15));
     }
 }

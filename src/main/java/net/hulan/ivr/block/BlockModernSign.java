@@ -562,7 +562,7 @@ public class BlockModernSign extends BlockDirectionalMapper implements EntityBlo
 
         SignType(String texture, String translation, boolean small, boolean flipTexture, boolean flipCustomText, boolean hasCustomText, int backgroundColor) {
             textureId = new ResourceLocation("mtr:textures/block/sign/" + texture + ".png");
-            customText = hasCustomText ? mtr.mappings.Text.translatable("sign.mtr." + translation + "_cjk").append("|").append(mtr.mappings.Text.translatable("sign.mtr." + translation)).getString() : "";
+            customText = hasCustomText ? Text.translatable("sign.mtr." + translation + "_cjk").append("|").append(Text.translatable("sign.mtr." + translation)).getString() : "";
             this.small = small;
             this.flipTexture = flipTexture;
             this.flipCustomText = flipCustomText;

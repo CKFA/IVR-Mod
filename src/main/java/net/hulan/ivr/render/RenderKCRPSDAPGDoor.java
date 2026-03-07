@@ -29,20 +29,20 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 public class RenderKCRPSDAPGDoor<T extends BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase> extends BlockEntityRendererMapper<T> implements IGui, IBlock {
     
     private final int type;
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD = new RenderKCRPSDAPGDoor.ModelSingleCube(36, 18, 0, 0, 0, 16, 16, 2);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_END_LEFT_1 = new RenderKCRPSDAPGDoor.ModelSingleCube(20, 18, 0, 0, 0, 8, 16, 2);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_END_RIGHT_1 = new RenderKCRPSDAPGDoor.ModelSingleCube(20, 18, 8, 0, 0, 8, 16, 2);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_END_LEFT_2 = new RenderKCRPSDAPGDoor.ModelSingleCube(20, 18, 8, 0, 2, 8, 16, 2);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_END_RIGHT_2 = new RenderKCRPSDAPGDoor.ModelSingleCube(20, 18, 0, 0, 2, 8, 16, 2);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_LIGHT_LEFT = new RenderKCRPSDAPGDoor.ModelSingleCube(16, 16, 0, -1, 5, 1, 1, 1);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_LIGHT_RIGHT = new RenderKCRPSDAPGDoor.ModelSingleCube(16, 16, 15, -1, 5, 1, 1, 1);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_APG_TOP = new RenderKCRPSDAPGDoor.ModelSingleCube(34, 9, 0, 8, 1, 16, 8, 1);
-    private static final RenderKCRPSDAPGDoor.ModelAPGDoorBottom MODEL_APG_BOTTOM = new RenderKCRPSDAPGDoor.ModelAPGDoorBottom();
-    private static final RenderKCRPSDAPGDoor.ModelAPGDoorLight MODEL_APG_LIGHT = new RenderKCRPSDAPGDoor.ModelAPGDoorLight();
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_APG_DOOR_LOCKED = new RenderKCRPSDAPGDoor.ModelSingleCube(6, 6, 5, 10, 1, 6, 6, 0);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_PSD_DOOR_LOCKED = new RenderKCRPSDAPGDoor.ModelSingleCube(6, 6, 5, 6, 1, 6, 6, 0);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_LIFT_LEFT = new RenderKCRPSDAPGDoor.ModelSingleCube(28, 18, 0, 0, 0, 12, 16, 2);
-    private static final RenderKCRPSDAPGDoor.ModelSingleCube MODEL_LIFT_RIGHT = new RenderKCRPSDAPGDoor.ModelSingleCube(28, 18, 4, 0, 0, 12, 16, 2);
+    private static final ModelSingleCube MODEL_PSD = new ModelSingleCube(36, 18, 0, 0, 0, 16, 16, 2);
+    private static final ModelSingleCube MODEL_PSD_END_LEFT_1 = new ModelSingleCube(20, 18, 0, 0, 0, 8, 16, 2);
+    private static final ModelSingleCube MODEL_PSD_END_RIGHT_1 = new ModelSingleCube(20, 18, 8, 0, 0, 8, 16, 2);
+    private static final ModelSingleCube MODEL_PSD_END_LEFT_2 = new ModelSingleCube(20, 18, 8, 0, 2, 8, 16, 2);
+    private static final ModelSingleCube MODEL_PSD_END_RIGHT_2 = new ModelSingleCube(20, 18, 0, 0, 2, 8, 16, 2);
+    private static final ModelSingleCube MODEL_PSD_LIGHT_LEFT = new ModelSingleCube(16, 16, 0, -1, 5, 1, 1, 1);
+    private static final ModelSingleCube MODEL_PSD_LIGHT_RIGHT = new ModelSingleCube(16, 16, 15, -1, 5, 1, 1, 1);
+    private static final ModelSingleCube MODEL_APG_TOP = new ModelSingleCube(34, 9, 0, 8, 1, 16, 8, 1);
+    private static final ModelAPGDoorBottom MODEL_APG_BOTTOM = new ModelAPGDoorBottom();
+    private static final ModelAPGDoorLight MODEL_APG_LIGHT = new ModelAPGDoorLight();
+    private static final ModelSingleCube MODEL_APG_DOOR_LOCKED = new ModelSingleCube(6, 6, 5, 10, 1, 6, 6, 0);
+    private static final ModelSingleCube MODEL_PSD_DOOR_LOCKED = new ModelSingleCube(6, 6, 5, 6, 1, 6, 6, 0);
+    private static final ModelSingleCube MODEL_LIFT_LEFT = new ModelSingleCube(28, 18, 0, 0, 0, 12, 16, 2);
+    private static final ModelSingleCube MODEL_LIFT_RIGHT = new ModelSingleCube(28, 18, 4, 0, 0, 12, 16, 2);
 
     public RenderKCRPSDAPGDoor(BlockEntityRenderDispatcher dispatcher, int type) {
         super(dispatcher);

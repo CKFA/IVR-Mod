@@ -16,7 +16,7 @@ public class BlockKCRAPGDoor extends BlockPSDAPGDoorBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockKCRAPGDoor.TileEntityKCRAPGDoor(pos, state);
+        return new TileEntityKCRAPGDoor(pos, state);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class BlockKCRAPGDoor extends BlockPSDAPGDoorBase {
         return IVRItems.KCR_APG_DOOR.get();
     }
 
-    public static class TileEntityKCRAPGDoor extends BlockPSDAPGDoorBase.TileEntityPSDAPGDoorBase {
+    public static class TileEntityKCRAPGDoor extends TileEntityPSDAPGDoorBase {
         public TileEntityKCRAPGDoor(BlockPos pos, BlockState state) {
             super(IVRBlockEntityTypes.KCR_APG_DOOR_TILE_ENTITY.get(), pos, state);
         }

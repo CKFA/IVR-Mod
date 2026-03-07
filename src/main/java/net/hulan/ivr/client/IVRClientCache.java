@@ -35,7 +35,7 @@ public class IVRClientCache extends DataCache implements IGui {
     
     private Font font;
     private Font fontCjk;
-    private final Object2ObjectLinkedOpenHashMap<String, IVRClientCache.DynamicResource> dynamicResources = new Object2ObjectLinkedOpenHashMap<>();
+    private final Object2ObjectLinkedOpenHashMap<String, DynamicResource> dynamicResources = new Object2ObjectLinkedOpenHashMap<>();
     private final ObjectLinkedOpenHashSet<String> resourcesToRefresh = new ObjectLinkedOpenHashSet<>();
     private final java.util.List<Runnable> resourceRegistryQueue = new ArrayList<>();
     private static final ResourceLocation DEFAULT_BLACK_RESOURCE = new ResourceLocation("mtr", "textures/block/black.png");
@@ -62,47 +62,47 @@ public class IVRClientCache extends DataCache implements IGui {
         resourcesToRefresh.addAll(dynamicResources.keySet());
     }
 
-    public IVRClientCache.DynamicResource getPixelatedText(String text, int textColor, int maxWidth, float cjkSizeRatio, boolean fullPixel) {
-        return getResource(String.format("pixelated_text_%s_%s_%s_%s_%s", text, textColor, maxWidth, cjkSizeRatio, fullPixel), () -> IVRRouteMapGenerator.generatePixelatedText(text, textColor, maxWidth, cjkSizeRatio, fullPixel), IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+    public DynamicResource getPixelatedText(String text, int textColor, int maxWidth, float cjkSizeRatio, boolean fullPixel) {
+        return getResource(String.format("pixelated_text_%s_%s_%s_%s_%s", text, textColor, maxWidth, cjkSizeRatio, fullPixel), () -> IVRRouteMapGenerator.generatePixelatedText(text, textColor, maxWidth, cjkSizeRatio, fullPixel), DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getColorStrip(long platformId) {
-        return getResource(String.format("color_%s", platformId), () -> IVRRouteMapGenerator.generateColorStrip(platformId), IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+    public DynamicResource getColorStrip(long platformId) {
+        return getResource(String.format("color_%s", platformId), () -> IVRRouteMapGenerator.generateColorStrip(platformId), DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getStationName(String stationName, float aspectRatio) {
-        return getResource(String.format("station_name_%s_%s", stationName, aspectRatio), () -> IVRRouteMapGenerator.generateStationName(stationName, aspectRatio), IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+    public DynamicResource getStationName(String stationName, float aspectRatio) {
+        return getResource(String.format("station_name_%s_%s", stationName, aspectRatio), () -> IVRRouteMapGenerator.generateStationName(stationName, aspectRatio), DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getStationNameEntrance(int textColor, String stationName, float aspectRatio) {
-        return getResource(String.format("station_name_entrance_%s_%s_%s", textColor, stationName, aspectRatio), () -> IVRRouteMapGenerator.generateStationNameEntrance(textColor, stationName, aspectRatio), IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+    public DynamicResource getStationNameEntrance(int textColor, String stationName, float aspectRatio) {
+        return getResource(String.format("station_name_entrance_%s_%s_%s", textColor, stationName, aspectRatio), () -> IVRRouteMapGenerator.generateStationNameEntrance(textColor, stationName, aspectRatio), DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getSingleRowStationName(long platformId, float aspectRatio) {
-        return getResource(String.format("single_row_station_name_%s_%s", platformId, aspectRatio), () -> IVRRouteMapGenerator.generateSingleRowStationName(platformId, aspectRatio), IVRClientCache.DefaultRenderingColor.WHITE);
+    public DynamicResource getSingleRowStationName(long platformId, float aspectRatio) {
+        return getResource(String.format("single_row_station_name_%s_%s", platformId, aspectRatio), () -> IVRRouteMapGenerator.generateSingleRowStationName(platformId, aspectRatio), DefaultRenderingColor.WHITE);
     }
 
-    public IVRClientCache.DynamicResource getSignText(String text, HorizontalAlignment horizontalAlignment, float paddingScale, int backgroundColor, int textColor) {
-        return getResource(String.format("sign_text_%s_%s_%s_%s_%s", text, horizontalAlignment, paddingScale, backgroundColor, textColor), () -> IVRRouteMapGenerator.generateSignText(text, horizontalAlignment, paddingScale, backgroundColor, textColor), IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+    public DynamicResource getSignText(String text, HorizontalAlignment horizontalAlignment, float paddingScale, int backgroundColor, int textColor) {
+        return getResource(String.format("sign_text_%s_%s_%s_%s_%s", text, horizontalAlignment, paddingScale, backgroundColor, textColor), () -> IVRRouteMapGenerator.generateSignText(text, horizontalAlignment, paddingScale, backgroundColor, textColor), DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getLiftPanelDisplay(String originalText, int textColor) {
-        return getResource(String.format("lift_panel_display_%s", originalText), () -> IVRRouteMapGenerator.generateLiftPanel(originalText, textColor), IVRClientCache.DefaultRenderingColor.BLACK);
+    public DynamicResource getLiftPanelDisplay(String originalText, int textColor) {
+        return getResource(String.format("lift_panel_display_%s", originalText), () -> IVRRouteMapGenerator.generateLiftPanel(originalText, textColor), DefaultRenderingColor.BLACK);
     }
 
-    public IVRClientCache.DynamicResource getExitSignLetter(String exitLetter, String exitNumber, int backgroundColor) {
+    public DynamicResource getExitSignLetter(String exitLetter, String exitNumber, int backgroundColor) {
         return getResource(String.format("exit_sign_letter_%s_%s", exitLetter, exitNumber),
                 () -> IVRRouteMapGenerator.generateExitSignLetter(exitLetter, exitNumber, backgroundColor),
-                IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+                DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getRouteSquare(int color, String routeName, HorizontalAlignment horizontalAlignment) {
+    public DynamicResource getRouteSquare(int color, String routeName, HorizontalAlignment horizontalAlignment) {
         return getResource(String.format("route_square_%s_%s_%s", color, routeName, horizontalAlignment),
                 () -> IVRRouteMapGenerator.generateRouteSquare(color, routeName, horizontalAlignment),
-                IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+                DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getDirectionArrow(long platformId,
+    public DynamicResource getDirectionArrow(long platformId,
                                                             boolean hasLeft,
                                                             boolean hasRight,
                                                             HorizontalAlignment horizontalAlignment,
@@ -133,10 +133,10 @@ public class IVRClientCache extends DataCache implements IGui {
                         backgroundColor,
                         textColor,
                         transparentColor),
-                transparentColor == 0 && backgroundColor == -1 ? IVRClientCache.DefaultRenderingColor.WHITE : IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+                transparentColor == 0 && backgroundColor == -1 ? DefaultRenderingColor.WHITE : DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getDirectionArrowForRS(long platformId,
+    public DynamicResource getDirectionArrowForRS(long platformId,
                                                                  boolean hasLeft,
                                                                  boolean hasRight,
                                                                  HorizontalAlignment horizontalAlignment,
@@ -162,10 +162,10 @@ public class IVRClientCache extends DataCache implements IGui {
                         aspectRatio,
                         textColor,
                         transparentColor),
-                transparentColor == 0 && backgroundColor == -1 ? IVRClientCache.DefaultRenderingColor.WHITE : IVRClientCache.DefaultRenderingColor.TRANSPARENT);
+                transparentColor == 0 && backgroundColor == -1 ? DefaultRenderingColor.WHITE : DefaultRenderingColor.TRANSPARENT);
     }
 
-    public IVRClientCache.DynamicResource getRouteMap(long platformId,
+    public DynamicResource getRouteMap(long platformId,
                                                       boolean vertical,
                                                       boolean flip,
                                                       float aspectRatio,
@@ -181,10 +181,10 @@ public class IVRClientCache extends DataCache implements IGui {
                         flip,
                         aspectRatio,
                         transparentWhite),
-                transparentWhite ? IVRClientCache.DefaultRenderingColor.TRANSPARENT : IVRClientCache.DefaultRenderingColor.WHITE);
+                transparentWhite ? DefaultRenderingColor.TRANSPARENT : DefaultRenderingColor.WHITE);
     }
 
-    public IVRClientCache.DynamicResource getRouteMapForRS(long platformId,
+    public DynamicResource getRouteMapForRS(long platformId,
                                                       boolean vertical,
                                                       boolean flip,
                                                       float aspectRatio,
@@ -200,7 +200,7 @@ public class IVRClientCache extends DataCache implements IGui {
                         flip,
                         aspectRatio,
                         transparentWhite),
-                transparentWhite ? IVRClientCache.DefaultRenderingColor.TRANSPARENT : IVRClientCache.DefaultRenderingColor.WHITE);
+                transparentWhite ? DefaultRenderingColor.TRANSPARENT : DefaultRenderingColor.WHITE);
     }
 
     public byte[] getTextPixels(String text, int[] dimensions, int fontSizeCjk, int fontSize) {
@@ -306,7 +306,7 @@ public class IVRClientCache extends DataCache implements IGui {
         }
     }
 
-    private IVRClientCache.DynamicResource getResource(String key, Supplier<NativeImage> supplier, IVRClientCache.DefaultRenderingColor defaultRenderingColor) {
+    private DynamicResource getResource(String key, Supplier<NativeImage> supplier, DefaultRenderingColor defaultRenderingColor) {
         Minecraft minecraftClient = Minecraft.getInstance();
         if (font == null || fontCjk == null) {
             ResourceManager resourceManager = minecraftClient.getResourceManager();
@@ -324,7 +324,7 @@ public class IVRClientCache extends DataCache implements IGui {
             }
         }
         boolean needsRefresh = resourcesToRefresh.contains(key);
-        IVRClientCache.DynamicResource dynamicResource = dynamicResources.get(key);
+        DynamicResource dynamicResource = dynamicResources.get(key);
         if (dynamicResource != null && !needsRefresh) {
             return dynamicResource;
         } else {
@@ -369,10 +369,10 @@ public class IVRClientCache extends DataCache implements IGui {
         WHITE(IVRClientCache.DEFAULT_WHITE_RESOURCE),
         TRANSPARENT(IVRClientCache.DEFAULT_TRANSPARENT_RESOURCE);
 
-        private final IVRClientCache.DynamicResource dynamicResource;
+        private final DynamicResource dynamicResource;
 
         DefaultRenderingColor(ResourceLocation resourceLocation) {
-            dynamicResource = new IVRClientCache.DynamicResource(resourceLocation, null);
+            dynamicResource = new DynamicResource(resourceLocation, null);
         }
     }
 

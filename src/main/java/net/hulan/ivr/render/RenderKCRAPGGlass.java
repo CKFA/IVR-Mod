@@ -23,11 +23,11 @@ public class RenderKCRAPGGlass extends RenderKCRRouteBase<BlockKCRAPGGlass.TileE
     }
 
     @Override
-    protected RenderKCRRouteBase.RenderType getRenderType(BlockGetter world, BlockPos pos, BlockState state) {
+    protected RenderType getRenderType(BlockGetter world, BlockPos pos, BlockState state) {
         if (IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.LOWER) {
-            return RenderKCRRouteBase.RenderType.NONE;
+            return RenderType.NONE;
         } else {
-            return Math.floorMod(pos.getX(), 8) < 4 == Math.floorMod(pos.getZ(), 8) < 4 ? RenderKCRRouteBase.RenderType.ARROW : RenderKCRRouteBase.RenderType.ROUTE;
+            return Math.floorMod(pos.getX(), 8) < 4 == Math.floorMod(pos.getZ(), 8) < 4 ? RenderType.ARROW : RenderType.ROUTE;
         }
     }
 

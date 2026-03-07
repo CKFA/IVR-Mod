@@ -33,7 +33,7 @@ public class BlockModernRouteSign extends BlockKCRRouteSignBase {
 
     @Override
     public BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state) {
-        return new BlockModernRouteSign.TileEntityModernRouteSign(pos, state);
+        return new TileEntityModernRouteSign(pos, state);
     }
 
     @Override

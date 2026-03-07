@@ -4,14 +4,12 @@ import com.mojang.logging.LogUtils;
 import mtr.CreativeModeTabs;
 import mtr.MTR;
 import mtr.RegistryObject;
-import mtr.data.Depot;
-import mtr.data.Route;
-import mtr.data.Station;
 import mtr.item.ItemBlockEnchanted;
 import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.BlockEntityMapper;
 import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.RegistryUtilities;
+import mtr.packet.IPacket;
 import net.fabricmc.api.ModInitializer;
 import net.hulan.ivr.client.IVRClientData;
 import net.hulan.ivr.packet.IVRPacket;
@@ -27,7 +25,7 @@ import org.slf4j.Logger;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public class IVR implements ModInitializer, IVRPacket, IVRBlocks, IVRBlockEntityTypes, IVRCreativeModTabs {
+public class IVR implements ModInitializer, IVRPacket, IVRBlocks, IVRBlockEntityTypes, IVRCreativeModTabs, IPacket {
 
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "ivr";
@@ -161,18 +159,6 @@ public class IVR implements ModInitializer, IVRPacket, IVRBlocks, IVRBlockEntity
         mtr.Registry.registerNetworkReceiver(PACKET_CLASSICAL_SIGN_TYPES, IVRPacketTrainDataGuiServer::receiveClassicalSignIdsC2S);
         mtr.Registry.registerNetworkReceiver(PACKET_CLASSICAL_1ODD_SIGN_TYPES, IVRPacketTrainDataGuiServer::receiveClassicalSign1OddIdsC2S);
         mtr.Registry.registerNetworkReceiver(PACKET_MODERN_SIGN_TYPES, IVRPacketTrainDataGuiServer::receiveModernSignIdsC2S);
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_UPDATE_STATION, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_UPDATE_STATION, (railwayData) -> railwayData.stations, (railwayData) -> railwayData.dataCache.stationIdMap, (id, transportMode) -> new Station(id), false));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_UPDATE_PLATFORM, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_UPDATE_PLATFORM, (railwayData) -> railwayData.platforms, (railwayData) -> railwayData.dataCache.platformIdMap, null, false));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_UPDATE_SIDING, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_UPDATE_SIDING, (railwayData) -> railwayData.sidings, (railwayData) -> railwayData.dataCache.sidingIdMap, null, false));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_UPDATE_ROUTE, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_UPDATE_ROUTE, (railwayData) -> railwayData.routes, (railwayData) -> railwayData.dataCache.routeIdMap, Route::new, false));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_UPDATE_DEPOT, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_UPDATE_DEPOT, (railwayData) -> railwayData.depots, (railwayData) -> railwayData.dataCache.depotIdMap, Depot::new, false));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_UPDATE_LIFT, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_UPDATE_LIFT, (railwayData) -> railwayData.lifts, (railwayData) -> railwayData.dataCache.liftsServerIdMap, null, false));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_DELETE_STATION, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_DELETE_STATION, (railwayData) -> railwayData.stations, (railwayData) -> railwayData.dataCache.stationIdMap, null, true));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_DELETE_PLATFORM, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_DELETE_PLATFORM, (railwayData) -> railwayData.platforms, (railwayData) -> railwayData.dataCache.platformIdMap, null, true));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_DELETE_SIDING, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_DELETE_SIDING, (railwayData) -> railwayData.sidings, (railwayData) -> railwayData.dataCache.sidingIdMap, null, true));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_DELETE_ROUTE, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_DELETE_ROUTE, (railwayData) -> railwayData.routes, (railwayData) -> railwayData.dataCache.routeIdMap, null, true));
-        mtr.Registry.registerNetworkReceiver(PACKET_IVR_DELETE_DEPOT, (minecraftServer, player, packet) -> IVRPacketTrainDataGuiServer.receiveUpdateOrDeleteC2S(minecraftServer, player, packet, PACKET_IVR_DELETE_DEPOT, (railwayData) -> railwayData.depots, (railwayData) -> railwayData.dataCache.depotIdMap, null, true));
-        mtr.Registry.registerPlayerJoinEvent(IVRClientData::onPlayerJoin);
     }
 
     private static void registerItem(String path, RegistryObject<Item> item) {
