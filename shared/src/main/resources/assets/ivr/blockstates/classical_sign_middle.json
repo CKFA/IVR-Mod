@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=north": {
+			"model": "ivr:block/classical_sign_middle"
+		},
+		"facing=east": {
+			"model": "ivr:block/classical_sign_middle",
+			"y": 90
+		},
+		"facing=south": {
+			"model": "ivr:block/classical_sign_middle",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "ivr:block/classical_sign_middle",
+			"y": 270
+		}
+	}
+}

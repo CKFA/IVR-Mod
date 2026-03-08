@@ -1,0 +1,79 @@
+{
+	"variants": {
+		"facing=north,type=4": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half-1_pole"
+		},
+		"facing=east,type=4": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half-1_pole",
+			"y": 90
+		},
+		"facing=west,type=4": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half-1_pole",
+			"y": 270
+		},
+		"facing=south,type=4": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half-1_pole",
+			"y": 180
+		},
+		"facing=north,type=0": {
+			"model": "ivr:block/modern_sign_end_zero_pole"
+		},
+		"facing=east,type=0": {
+			"model": "ivr:block/modern_sign_end_zero_pole",
+			"y": 90
+		},
+		"facing=west,type=0": {
+			"model": "ivr:block/modern_sign_end_zero_pole",
+			"y": 270
+		},
+		"facing=south,type=0": {
+			"model": "ivr:block/modern_sign_end_zero_pole",
+			"y": 180
+		},
+		"facing=north,type=1": {
+			"model": "ivr:block/modern_sign_end_half_pole"
+		},
+		"facing=east,type=1": {
+			"model": "ivr:block/modern_sign_end_half_pole",
+			"y": 90
+		},
+		"facing=west,type=1": {
+			"model": "ivr:block/modern_sign_end_half_pole",
+			"y": 270
+		},
+		"facing=south,type=1": {
+			"model": "ivr:block/modern_sign_end_half_pole",
+			"y": 180
+		},
+		"facing=north,type=2": {
+			"model": "ivr:block/modern_sign_end_one_pole"
+		},
+		"facing=east,type=2": {
+			"model": "ivr:block/modern_sign_end_one_pole",
+			"y": 90
+		},
+		"facing=west,type=2": {
+			"model": "ivr:block/modern_sign_end_one_pole",
+			"y": 270
+		},
+		"facing=south,type=2": {
+			"model": "ivr:block/modern_sign_end_one_pole",
+			"y": 180
+		},
+		"facing=north,type=3": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half_pole"
+		},
+		"facing=east,type=3": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half_pole",
+			"y": 90
+		},
+		"facing=west,type=3": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half_pole",
+			"y": 270
+		},
+		"facing=south,type=3": {
+			"model": "ivr:block/modern_sign_end_one_and_a_half_pole",
+			"y": 180
+		}
+	}
+}

@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.hulan.ivr.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "PacketTrainDataGuiClientMixin",
+    "PacketTrainDataGuiServerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

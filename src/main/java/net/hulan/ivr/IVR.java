@@ -1,6 +1,5 @@
 package net.hulan.ivr;
 
-import com.mojang.logging.LogUtils;
 import mtr.CreativeModeTabs;
 import mtr.MTR;
 import mtr.RegistryObject;
@@ -11,7 +10,6 @@ import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.RegistryUtilities;
 import mtr.packet.IPacket;
 import net.fabricmc.api.ModInitializer;
-import net.hulan.ivr.client.IVRClientData;
 import net.hulan.ivr.packet.IVRPacket;
 import net.hulan.ivr.packet.IVRPacketTrainDataGuiServer;
 import net.minecraft.core.Registry;
@@ -20,15 +18,16 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class IVR implements ModInitializer, IVRPacket, IVRBlocks, IVRBlockEntityTypes, IVRCreativeModTabs, IPacket {
 
-    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "ivr";
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     @Override
     public void onInitialize() {

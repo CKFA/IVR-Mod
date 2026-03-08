@@ -1,0 +1,7 @@
+{
+	"parent": "mtr:block/leaves_column",
+	"textures": {
+		"end": "ivr:block/kcr_station_wall_yellow_top",
+		"side": "ivr:block/kcr_station_wall_yellow"
+	}
+}

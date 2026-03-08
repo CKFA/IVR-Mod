@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=north": {
+			"model": "ivr:block/kcr_platform_normal"
+		},
+		"facing=east": {
+			"model": "ivr:block/kcr_platform_normal",
+			"y": 90
+		},
+		"facing=south": {
+			"model": "ivr:block/kcr_platform_normal",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "ivr:block/kcr_platform_normal",
+			"y": 270
+		}
+	}
+}

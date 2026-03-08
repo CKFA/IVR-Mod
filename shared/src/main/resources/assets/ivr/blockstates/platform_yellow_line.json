@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=north": {
+			"model": "ivr:block/platform_yellow_line"
+		},
+		"facing=east": {
+			"model": "ivr:block/platform_yellow_line",
+			"y": 90
+		},
+		"facing=south": {
+			"model": "ivr:block/platform_yellow_line",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "ivr:block/platform_yellow_line",
+			"y": 270
+		}
+	}
+}

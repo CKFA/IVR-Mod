@@ -1,0 +1,5 @@
+{
+	"variants": {
+		"": { "model": "ivr:block/kcr_station_name_wall" }
+	}
+}

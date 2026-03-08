@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"light": "mtr:block/light_off"
+	},
+	"elements": [
+		{
+			"from": [5, 10, 0],
+			"to": [6, 11, 1],
+			"faces": {
+				"east": {"uv": [0, 1, 16, 16], "texture": "#light"},
+				"south": {"uv": [2, 1, 8, 16], "texture": "#light"},
+				"down": {"uv": [2, 3, 2, 3], "texture": "#light", "cullface": "down"}
+			}
+		}
+	]
+}
