@@ -1,7 +1,4 @@
-// 根目录 build.gradle
-// 对所有子模块应用通用配置
 subprojects {
-    // 应用基础插件（注意：不要在这里应用 fabric-loom，因为它是版本相关的）
     apply plugin: 'java-library'
 
     version = project.mod_version
@@ -9,18 +6,13 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven { url "https://maven.fabricmc.net/" }  // Fabric 仓库
-        // 如果有其他公共仓库，也加在这里
-    }
-
-    // 统一 Java 版本设置（根据最低支持的 Minecraft 版本调整）
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        maven {
+            url "https://maven.fabricmc.net/"
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = "UTF-8"
-        options.release = 17   // 与上面保持一致
+        options.release = 17
     }
 }
