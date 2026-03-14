@@ -1,7 +1,0 @@
-{
-	"parent": "mtr:block/leaves_column",
-	"textures": {
-		"end": "ivr:block/platform_normal",
-		"side": "ivr:block/platform_normal"
-	}
-}

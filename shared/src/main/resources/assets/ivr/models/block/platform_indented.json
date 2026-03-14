@@ -1,9 +1,0 @@
-{
-	"parent": "mtr:block/platform_base_indented",
-	"textures": {
-		"main": "ivr:block/platform_normal",
-		"front": "ivr:block/platform_normal",
-		"inner": "ivr:block/platform_indented_inner",
-		"top": "ivr:block/platform_indented"
-	}
-}

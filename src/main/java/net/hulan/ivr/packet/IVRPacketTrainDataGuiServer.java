@@ -5,25 +5,20 @@ import mtr.Registry;
 import mtr.data.*;
 import mtr.mappings.BlockEntityMapper;
 import mtr.packet.PacketTrainDataBase;
-import net.hulan.ivr.IVR;
 import net.hulan.ivr.block.BlockClassicalSign;
 import net.hulan.ivr.block.BlockKCRRouteSignBase;
 import net.hulan.ivr.block.BlockModernSign;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 public class IVRPacketTrainDataGuiServer extends PacketTrainDataBase implements IVRPacket {
-
-    private static final int PACKET_CHUNK_SIZE = (int)Math.pow(2.0D, 14.0D);
 
     public static void openClassicalSignScreenS2C(ServerPlayer player, BlockPos signPos) {
         final FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
