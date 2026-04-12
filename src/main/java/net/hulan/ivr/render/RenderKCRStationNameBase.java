@@ -50,7 +50,7 @@ public abstract class RenderKCRStationNameBase<T extends BlockKCRStationNameBase
                     }
                     matricesNew.translate(0.0D, 0.0D, 0.5D - (double)entity.zOffset - 0.0031250000465661287D);
                 });
-                this.drawStationName(world, pos, state, facing, storedMatrixTransformations2, vertexConsumers, station == null ? Text.translatable("gui.mtr.untitled", new Object[0]).getString() : station.name, station == null ? 0 : station.color, color, light);
+                this.drawStationName(world, pos, state, facing, storedMatrixTransformations2, vertexConsumers, station == null ? Text.translatable("gui.mtr.untitled").getString() : station.name, station == null ? 0 : station.color, color, light);
             }
         }
     }
