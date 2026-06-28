@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "ksd:block/kp_horizontal_crossbar"
+    },
+    "facing=east": {
+      "model": "ksd:block/kp_horizontal_crossbar",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "ksd:block/kp_horizontal_crossbar",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "ksd:block/kp_horizontal_crossbar",
+      "y": 270
+    }
+  }
+}

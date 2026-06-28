@@ -1,0 +1,94 @@
+{
+  "variants": {
+    "facing=north,style=side_1_is": {
+      "model": "ksd:block/kp_cell_side_1_is"
+    },
+    "facing=east,style=side_1_is": {
+      "model": "ksd:block/kp_cell_side_1_is",
+      "y": 90
+    },
+    "facing=south,style=side_1_is": {
+      "model": "ksd:block/kp_cell_side_1_is",
+      "y": 180
+    },
+    "facing=west,style=side_1_is": {
+      "model": "ksd:block/kp_cell_side_1_is",
+      "y": 270
+    },
+    "facing=north,style=side_2_is": {
+      "model": "ksd:block/kp_cell_side_2_is"
+    },
+    "facing=east,style=side_2_is": {
+      "model": "ksd:block/kp_cell_side_2_is",
+      "y": 90
+    },
+    "facing=south,style=side_2_is": {
+      "model": "ksd:block/kp_cell_side_2_is",
+      "y": 180
+    },
+    "facing=west,style=side_2_is": {
+      "model": "ksd:block/kp_cell_side_2_is",
+      "y": 270
+    },
+    "facing=north,style=side_3_is": {
+      "model": "ksd:block/kp_cell_side_3_is"
+    },
+    "facing=east,style=side_3_is": {
+      "model": "ksd:block/kp_cell_side_3_is",
+      "y": 90
+    },
+    "facing=south,style=side_3_is": {
+      "model": "ksd:block/kp_cell_side_3_is",
+      "y": 180
+    },
+    "facing=west,style=side_3_is": {
+      "model": "ksd:block/kp_cell_side_3_is",
+      "y": 270
+    },
+    "facing=north,style=side_1_os": {
+      "model": "ksd:block/kp_cell_side_1_os"
+    },
+    "facing=east,style=side_1_os": {
+      "model": "ksd:block/kp_cell_side_1_os",
+      "y": 90
+    },
+    "facing=south,style=side_1_os": {
+      "model": "ksd:block/kp_cell_side_1_os",
+      "y": 180
+    },
+    "facing=west,style=side_1_os": {
+      "model": "ksd:block/kp_cell_side_1_os",
+      "y": 270
+    },
+    "facing=north,style=side_2_os": {
+      "model": "ksd:block/kp_cell_side_2_os"
+    },
+    "facing=east,style=side_2_os": {
+      "model": "ksd:block/kp_cell_side_2_os",
+      "y": 90
+    },
+    "facing=south,style=side_2_os": {
+      "model": "ksd:block/kp_cell_side_2_os",
+      "y": 180
+    },
+    "facing=west,style=side_2_os": {
+      "model": "ksd:block/kp_cell_side_2_os",
+      "y": 270
+    },
+    "facing=north,style=side_3_os": {
+      "model": "ksd:block/kp_cell_side_3_os"
+    },
+    "facing=east,style=side_3_os": {
+      "model": "ksd:block/kp_cell_side_3_os",
+      "y": 90
+    },
+    "facing=south,style=side_3_os": {
+      "model": "ksd:block/kp_cell_side_3_os",
+      "y": 180
+    },
+    "facing=west,style=side_3_os": {
+      "model": "ksd:block/kp_cell_side_3_os",
+      "y": 270
+    }
+  }
+}

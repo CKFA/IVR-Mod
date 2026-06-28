@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "ksd:block/kp_pole_double_side"
+    },
+    "facing=east": {
+      "model": "ksd:block/kp_pole_double_side",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "ksd:block/kp_pole_double_side",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "ksd:block/kp_pole_double_side",
+      "y": 270
+    }
+  }
+}
