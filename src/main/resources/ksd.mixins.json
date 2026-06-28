@@ -1,0 +1,30 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "net.hulan.ksd.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BlockTicketBarrierMixin",
+    "BlockTicketMachineMixin",
+    "ClientCacheMixin",
+    "DataCacheMixin",
+    "RailwayDataMixin",
+    "RouteTypeMixin",
+    "SavedRailBaseAccessor",
+    "SidingAccessor",
+    "TicketSystemMixin",
+    "TrainInvoker",
+    "TrainMixin",
+    "TrainServerAccessor",
+    "VehicleRidingServerMixin"
+  ],
+  "client": [
+    "DashboardScreenMixin",
+    "EditRouteScreenMixin",
+    "EditStationScreenMixin",
+    "PlatformScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
