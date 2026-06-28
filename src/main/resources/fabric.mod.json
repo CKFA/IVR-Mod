@@ -11,14 +11,17 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "net.hulan.ivr.IVRClient"
+      "net.hulan.ivr.IVRClient",
+      "net.hulan.ksd.KSDClientMain"
     ],
     "main": [
-      "net.hulan.ivr.IVR"
+      "net.hulan.ivr.IVR",
+      "net.hulan.ksd.KSDMain"
     ]
   },
   "mixins": [
-    "IVR.mixins.json"
+    "IVR.mixins.json",
+    "ksd.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.7",
