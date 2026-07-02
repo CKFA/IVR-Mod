@@ -5,7 +5,7 @@ import mtr.client.IDrawing;
 import mtr.render.RenderTrains;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockKCRStationNameTallBase;
-import net.hulan.ivr.client.IVRClientData;
+import net.hulan.ksd.client.KSDClientData;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
@@ -25,7 +25,7 @@ public class RenderKCRStationNameTall<T extends BlockKCRStationNameTallBase.Tile
     @Override
     protected void drawStationName(BlockGetter world, BlockPos pos, BlockState state, Direction facing, StoredMatrixTransformations storedMatrixTransformations, MultiBufferSource vertexConsumers, String stationName, int stationColor, int color, int light) {
         if (IBlock.getStatePropertySafe(state, BlockKCRStationNameTallBase.THIRD) == IBlock.EnumThird.MIDDLE) {
-            RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getStationName(stationName, 1).resourceLocation, false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
+            RenderTrains.scheduleRender(KSDClientData.DATA_CACHE.getStationName(stationName, 1).resourceLocation, false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
                 storedMatrixTransformations.transform(matrices);
                 IDrawing.drawTexture(matrices, vertexConsumer, -0.5F, -0.5F, 1.0F, 1.0F, 0, 0.0F, 1, 1.0F, facing, color, light);
                 matrices.popPose();

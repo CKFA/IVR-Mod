@@ -2,11 +2,8 @@ package net.hulan.ivr.packet;
 
 import io.netty.buffer.Unpooled;
 import mtr.RegistryClient;
-import mtr.client.ClientData;
 import mtr.mappings.UtilitiesClient;
 import mtr.packet.PacketTrainDataBase;
-import net.hulan.ivr.IVR;
-import net.hulan.ivr.client.IVRClientData;
 import net.hulan.ivr.screen.ClassicalSign1OddScreen;
 import net.hulan.ivr.screen.ClassicalSignScreen;
 import net.hulan.ivr.screen.ModernSignScreen;

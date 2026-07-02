@@ -15,4 +15,8 @@ subprojects {
         options.encoding = "UTF-8"
         options.release = 17
     }
+
+    dependencies {
+        implementation 'com.google.code.gson:gson:2.14.0'
+    }
 }

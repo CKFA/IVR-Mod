@@ -31,7 +31,7 @@ public class BlockKCRClock extends BlockMapper implements EntityBlockMapper {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         boolean facing = ctx.getHorizontalDirection().getAxis() == Direction.Axis.X;
-        return this.defaultBlockState().setValue(FACING, facing);
+        return defaultBlockState().setValue(FACING, facing);
     }
 
     @SuppressWarnings("deprecation")

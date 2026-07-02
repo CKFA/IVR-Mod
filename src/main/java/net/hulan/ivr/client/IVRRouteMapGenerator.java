@@ -9,6 +9,8 @@ import mtr.client.Config;
 import mtr.client.IDrawing;
 import mtr.data.*;
 import mtr.mappings.Utilities;
+import net.hulan.ksd.client.KSDClientCache;
+import net.hulan.ksd.client.KSDClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +42,7 @@ public class IVRRouteMapGenerator implements IGui {
             int scale = fullPixel ? 1 : 4;
             int newMaxWidth = maxWidth / scale;
             int[] dimensions = new int[2];
-            byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(text, dimensions, newMaxWidth, 2147483647, Math.round(24.0F * (cjkSizeRatio > 0.0F ? cjkSizeRatio + 1.0F : 1.0F)), Math.round(24.0F * (cjkSizeRatio < 0.0F ? 1.0F - cjkSizeRatio : 1.0F)), 0, HorizontalAlignment.CENTER);
+            byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(text, dimensions, newMaxWidth, 2147483647, Math.round(24.0F * (cjkSizeRatio > 0.0F ? cjkSizeRatio + 1.0F : 1.0F)), Math.round(24.0F * (cjkSizeRatio < 0.0F ? 1.0F - cjkSizeRatio : 1.0F)), 0, HorizontalAlignment.CENTER);
             int width = Math.min(newMaxWidth, dimensions[0]) * scale;
             int height = dimensions[1] * scale;
             NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
@@ -80,7 +82,7 @@ public class IVRRouteMapGenerator implements IGui {
                 int height = scale * 2;
                 int width = Math.round((float)height * aspectRatio);
                 int[] dimensions = new int[2];
-                byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(IGui.formatVerticalChinese(stationName), dimensions, width, height, fontSizeBig * 2, fontSizeSmall * 2, 0, HorizontalAlignment.CENTER);
+                byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(IGui.formatVerticalChinese(stationName), dimensions, width, height, fontSizeBig * 2, fontSizeSmall * 2, 0, HorizontalAlignment.CENTER);
                 NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
                 nativeImage.fillRect(0, 0, width, height, 0);
                 drawString(nativeImage, pixels, width / 2, height / 2, dimensions, HorizontalAlignment.CENTER, VerticalAlignment.CENTER, 0, -1, false);
@@ -101,7 +103,7 @@ public class IVRRouteMapGenerator implements IGui {
                 int width = Math.round((float)size * aspectRatio);
                 int padding = scale / 16;
                 int[] dimensions = new int[2];
-                byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(stationName, dimensions, width - size - padding, size - padding * 2, fontSizeBig * 3, fontSizeSmall * 3, padding, HorizontalAlignment.LEFT);
+                byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(stationName, dimensions, width - size - padding, size - padding * 2, fontSizeBig * 3, fontSizeSmall * 3, padding, HorizontalAlignment.LEFT);
                 int xOffset = (width - dimensions[0] - size) / 2;
                 int fakeBackgroundColor = textColor == -16777216 ? textColor + 65793 : 0;
                 NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, size, false);
@@ -123,7 +125,7 @@ public class IVRRouteMapGenerator implements IGui {
         } else {
             try {
                 int[] dimensions = new int[2];
-                byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(getStationName(platformId).replace("|", " | "), dimensions, fontSizeBig, fontSizeSmall);
+                byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(getStationName(platformId).replace("|", " | "), dimensions, fontSizeBig, fontSizeSmall);
                 int padding = dimensions[1] / 2;
                 int height = dimensions[1] + padding;
                 int width = Math.max(Math.round((float)height * aspectRatio), dimensions[0] + padding);
@@ -145,7 +147,7 @@ public class IVRRouteMapGenerator implements IGui {
             int tileSize = height - padding * 2;
             int tilePadding = tileSize / 4;
             int[] dimensions = new int[2];
-            byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(text, dimensions, 2147483647, (int)((float)tileSize * 1.25F), tileSize * 3 / 5, tileSize * 3 / 10, tilePadding, horizontalAlignment);
+            byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(text, dimensions, 2147483647, (int)((float)tileSize * 1.25F), tileSize * 3 / 5, tileSize * 3 / 10, tilePadding, horizontalAlignment);
             int width = dimensions[0] - tilePadding * 2;
             if (width > 0 && height > 0) {
                 NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
@@ -167,7 +169,7 @@ public class IVRRouteMapGenerator implements IGui {
             int width = Math.round((float)scale * 1.5F);
             int height = fontSizeSmall * 2 * text.split("\\|").length;
             int[] dimensions = new int[2];
-            byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(text.toUpperCase(Locale.ENGLISH), dimensions, width, height, fontSizeSmall * 2, fontSizeSmall * 2, 0, HorizontalAlignment.CENTER);
+            byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(text.toUpperCase(Locale.ENGLISH), dimensions, width, height, fontSizeSmall * 2, fontSizeSmall * 2, 0, HorizontalAlignment.CENTER);
             NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
             nativeImage.fillRect(0, 0, width, height, 0);
             drawString(nativeImage, pixels, width / 2, height / 2, dimensions, HorizontalAlignment.CENTER, VerticalAlignment.CENTER, -16777216, textColor, false);
@@ -185,9 +187,9 @@ public class IVRRouteMapGenerator implements IGui {
             boolean noNumber = exitNumber.isEmpty();
             int textSize = size * 7 / 8;
             int[] dimensions1 = new int[2];
-            byte[] pixels1 = IVRClientData.DATA_CACHE.getTextPixels(exitLetter, dimensions1, noNumber ? textSize : textSize * 2 / 3, textSize, textSize, size, size, HorizontalAlignment.CENTER);
+            byte[] pixels1 = KSDClientData.DATA_CACHE.getTextPixels(exitLetter, dimensions1, noNumber ? textSize : textSize * 2 / 3, textSize, textSize, size, size, HorizontalAlignment.CENTER);
             int[] dimensions2 = new int[2];
-            byte[] pixels2 = noNumber ? null : IVRClientData.DATA_CACHE.getTextPixels(exitNumber, dimensions2, textSize / 3, textSize, textSize / 2, textSize / 2, size, HorizontalAlignment.CENTER);
+            byte[] pixels2 = noNumber ? null : KSDClientData.DATA_CACHE.getTextPixels(exitNumber, dimensions2, textSize / 3, textSize, textSize / 2, textSize / 2, size, HorizontalAlignment.CENTER);
             NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, size, size, false);
             nativeImage.fillRect(0, 0, size, size, backgroundColor);
             drawResource(nativeImage, "textures/block/classical/sign/exit_letter_blank.png", 0, 0, size, size, false, 0.0F, 1.0F, 0, true);
@@ -206,7 +208,7 @@ public class IVRRouteMapGenerator implements IGui {
         try {
             int padding = scale / 32;
             int[] dimensions = new int[2];
-            byte[] pixels = IVRClientData.DATA_CACHE.getTextPixels(routeName, dimensions, 2147483647, (int)((float)(fontSizeBig + fontSizeSmall) * 1.25F), fontSizeBig, fontSizeSmall, padding, horizontalAlignment);
+            byte[] pixels = KSDClientData.DATA_CACHE.getTextPixels(routeName, dimensions, 2147483647, (int)((float)(fontSizeBig + fontSizeSmall) * 1.25F), fontSizeBig, fontSizeSmall, padding, horizontalAlignment);
             int width = dimensions[0] + padding * 2;
             int height = dimensions[1] + padding * 2;
             NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
@@ -242,7 +244,7 @@ public class IVRRouteMapGenerator implements IGui {
                 int padding = Math.round((float)height * paddingScale);
                 int tileSize = height - padding * 2;
                 if (width > 0 && height > 0) {
-                    IVRClientCache clientCache = IVRClientData.DATA_CACHE;
+                    KSDClientCache clientCache = KSDClientData.DATA_CACHE;
                     NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
                     nativeImage.fillRect(0, 0, width, height, invertColor(backgroundColor));
                     int circleX;
@@ -313,7 +315,7 @@ public class IVRRouteMapGenerator implements IGui {
                 int padding = Math.round((float)height * paddingScale);
                 int tileSize = height - padding * 2;
                 if (width > 0 && height > 0) {
-                    IVRClientCache clientCache = IVRClientData.DATA_CACHE;
+                    KSDClientCache clientCache = KSDClientData.DATA_CACHE;
                     NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
                     nativeImage.fillRect(0, 0, width, height, invertColor(routeColor | ARGB_BLACK));
                     int circleX;
@@ -367,7 +369,7 @@ public class IVRRouteMapGenerator implements IGui {
                 getRouteStream(platformId, (routeX, currentStationIndex) -> routeDetails.add(new Tuple<>(routeX, currentStationIndex)));
                 int routeCount = routeDetails.size();
                 if (routeCount > 0) {
-                    IVRClientCache clientCache = IVRClientData.DATA_CACHE;
+                    KSDClientCache clientCache = KSDClientData.DATA_CACHE;
                     List<List<Long>> stationsIdsBefore = new ArrayList<>();
                     List<List<Long>> stationsIdsAfter = new ArrayList<>();
                     List<Map<Integer, StationPosition>> stationPositions = new ArrayList<>();
@@ -555,7 +557,7 @@ public class IVRRouteMapGenerator implements IGui {
                 int routeCount = routeDetails.size();
                 System.out.println(routeDetails);
                 if (routeCount > 0) {
-                    IVRClientCache clientCache = IVRClientData.DATA_CACHE;
+                    KSDClientCache clientCache = KSDClientData.DATA_CACHE;
                     List<List<Long>> stationsIdsBefore = new ArrayList<>();
                     List<List<Long>> stationsIdsAfter = new ArrayList<>();
                     List<Map<Integer, StationPosition>> stationPositions = new ArrayList<>();

@@ -43,6 +43,7 @@ public class BlockModernRouteSign extends BlockKCRRouteSignBase {
     }
 
     public static class TileEntityModernRouteSign extends TileEntityKCRRouteSignBase {
+
         public TileEntityModernRouteSign(BlockPos pos, BlockState state) {
             super(MODERN_ROUTE_SIGN_TILE_ENTITY.get(), pos, state);
         }

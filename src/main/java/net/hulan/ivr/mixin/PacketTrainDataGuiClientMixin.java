@@ -3,10 +3,8 @@ package net.hulan.ivr.mixin;
 import mtr.client.ClientData;
 import mtr.data.NameColorDataBase;
 import mtr.data.TransportMode;
-import mtr.packet.PacketTrainDataBase;
 import mtr.packet.PacketTrainDataGuiClient;
 import net.hulan.ivr.IVR;
-import net.hulan.ivr.client.IVRClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import static net.hulan.ivr.client.IVRClientData.DATA_CACHE;
+import static net.hulan.ksd.client.KSDClientData.DATA_CACHE;
 
 @Mixin(value = PacketTrainDataGuiClient.class)
 public class PacketTrainDataGuiClientMixin {

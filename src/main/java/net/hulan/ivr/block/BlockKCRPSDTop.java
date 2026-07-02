@@ -13,6 +13,9 @@ import mtr.mappings.EntityBlockMapper;
 import net.hulan.ivr.IVRBlockEntityTypes;
 import net.hulan.ivr.IVRBlocks;
 import net.hulan.ivr.IVRItems;
+import net.hulan.ksd.data.KSDDataCache;
+import net.hulan.ksd.data.KSDPlatform;
+import net.hulan.ksd.data.KSDRailwayData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -173,6 +176,7 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
     }
 
     public enum EnumPersistent implements StringRepresentable {
+
         NONE("none"),
         ARROW("arrow"),
         ROUTE("route"),
@@ -191,12 +195,14 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
     }
 
     public static class TileEntityKCRPSDTop extends TileEntityKCRRouteBase {
+
         public TileEntityKCRPSDTop(BlockPos pos, BlockState state) {
             super(IVRBlockEntityTypes.KCR_PSD_TOP_TILE_ENTITY.get(), pos, state);
         }
     }
 
     public static class TileEntityKCRRouteBase extends BlockEntityMapper {
+
         private long cachedRefreshTime;
         private long cachedPlatformId;
 
@@ -204,9 +210,9 @@ public class BlockKCRPSDTop extends BlockDirectionalMapper implements EntityBloc
             super(type, pos, state);
         }
 
-        public long getPlatformId(Set<Platform> platforms, DataCache dataCache) {
+        public long getPlatformId(Set<KSDPlatform> platforms, KSDDataCache dataCache) {
             if (dataCache.needsRefresh(cachedRefreshTime)) {
-                cachedPlatformId = RailwayData.getClosePlatformId(platforms, dataCache, getBlockPos());
+                cachedPlatformId = KSDRailwayData.getClosePlatformId(platforms, dataCache, getBlockPos());
                 cachedRefreshTime = System.currentTimeMillis();
             }
             return cachedPlatformId;

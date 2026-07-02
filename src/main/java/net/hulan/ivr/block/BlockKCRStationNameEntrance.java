@@ -81,6 +81,7 @@ public class BlockKCRStationNameEntrance extends BlockKCRStationNameBase {
     }
 
     public static class TileEntityKCRStationNameEntrance extends TileEntityKCRStationNameBase {
+
         public TileEntityKCRStationNameEntrance(BlockPos pos, BlockState state) {
             super(KCR_STATION_NAME_ENTRANCE_TILE_ENTITY.get(), pos, state, 0.0F, 0.00625F, false);
         }

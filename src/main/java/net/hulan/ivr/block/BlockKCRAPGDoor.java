@@ -25,6 +25,7 @@ public class BlockKCRAPGDoor extends BlockPSDAPGDoorBase {
     }
 
     public static class TileEntityKCRAPGDoor extends TileEntityPSDAPGDoorBase {
+
         public TileEntityKCRAPGDoor(BlockPos pos, BlockState state) {
             super(IVRBlockEntityTypes.KCR_APG_DOOR_TILE_ENTITY.get(), pos, state);
         }

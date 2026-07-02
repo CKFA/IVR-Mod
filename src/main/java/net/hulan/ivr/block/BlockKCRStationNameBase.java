@@ -39,6 +39,7 @@ public abstract class BlockKCRStationNameBase extends BlockDirectionalMapper imp
     public abstract BlockEntityMapper createBlockEntity(BlockPos pos, BlockState state);
 
     public abstract static class TileEntityKCRStationNameBase extends BlockEntityMapper implements IGui {
+
         public final float yOffset;
         public final float zOffset;
         public final boolean isDoubleSided;

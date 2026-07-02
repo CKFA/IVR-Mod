@@ -20,10 +20,7 @@ import org.msgpack.value.Value;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class KSDRailwayData extends PersistentStateMapper {
 
@@ -179,6 +176,35 @@ public class KSDRailwayData extends PersistentStateMapper {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static long getClosePlatformId(Set<KSDPlatform> platforms, KSDDataCache dataCache, BlockPos pos) {
+        return getClosePlatformId(platforms, dataCache, pos, 5, 0, 4);
+    }
+
+    public static long getClosePlatformId(Set<KSDPlatform> platforms, KSDDataCache dataCache, BlockPos pos, int radius, int lower, int upper) {
+        try {
+            long posLong = pos.asLong();
+            if (dataCache.blockPosToPlatformId.containsKey(posLong)) {
+                return dataCache.blockPosToPlatformId.get(posLong);
+            } else {
+                long platformId = 0L;
+
+                for(int i = 1; i <= radius; ++i) {
+                    int finalI = i;
+                    platformId = platforms.stream().filter((platform) -> platform.isCloseToSavedRail(pos, finalI, lower, upper)).min(Comparator.comparingInt((platform) -> platform.getMidPos().distManhattan(pos))).map((platform) -> platform.id).orElse(0L);
+                    if (platformId != 0L) {
+                        break;
+                    }
+                }
+
+                dataCache.blockPosToPlatformId.put(posLong, platformId);
+                return platformId;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
         }
     }
 

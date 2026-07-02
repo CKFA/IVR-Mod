@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import mtr.block.BlockRailwaySign;
 import mtr.block.BlockStationNameBase;
 import mtr.block.IBlock;
 import mtr.client.ClientCache;
@@ -12,16 +13,17 @@ import mtr.client.ClientData;
 import mtr.client.CustomResources;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
-import mtr.data.Platform;
 import mtr.data.RailwayData;
-import mtr.data.Station;
 import mtr.mappings.BlockEntityRendererMapper;
 import mtr.mappings.UtilitiesClient;
 import mtr.render.RenderTrains;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockModernSign;
-import net.hulan.ivr.client.IVRClientCache;
-import net.hulan.ivr.client.IVRClientData;
+import net.hulan.ksd.client.KSDClientCache;
+import net.hulan.ksd.client.KSDClientData;
+import net.hulan.ksd.data.KSDPlatform;
+import net.hulan.ksd.data.KSDRailwayData;
+import net.hulan.ksd.data.KSDStation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -146,18 +148,18 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
         final boolean hasCustomText = sign.hasCustomText();
         final boolean flipCustomText = sign.flipCustomText;
         final boolean flipTexture = sign.flipTexture;
-        final boolean isExit = signId.equals(BlockModernSign.SignType.EXIT_LETTER.toString()) || signId.equals(BlockModernSign.SignType.EXIT_LETTER_FLIPPED.toString());
-        final boolean isLine = signId.equals(BlockModernSign.SignType.LINE.toString()) || signId.equals(BlockModernSign.SignType.LINE_FLIPPED.toString());
-        final boolean isPlatform = signId.equals(BlockModernSign.SignType.PLATFORM.toString()) || signId.equals(BlockModernSign.SignType.PLATFORM_FLIPPED.toString());
-        final boolean isStation = signId.equals(BlockModernSign.SignType.STATION.toString()) || signId.equals(BlockModernSign.SignType.STATION_FLIPPED.toString());
+        final boolean isExit = signId.equals(BlockRailwaySign.SignType.EXIT_LETTER.toString()) || signId.equals(BlockRailwaySign.SignType.EXIT_LETTER_FLIPPED.toString());
+        final boolean isLine = signId.equals(BlockRailwaySign.SignType.LINE.toString()) || signId.equals(BlockRailwaySign.SignType.LINE_FLIPPED.toString());
+        final boolean isPlatform = signId.equals(BlockRailwaySign.SignType.PLATFORM.toString()) || signId.equals(BlockRailwaySign.SignType.PLATFORM_FLIPPED.toString());
+        final boolean isStation = signId.equals(BlockRailwaySign.SignType.STATION.toString()) || signId.equals(BlockRailwaySign.SignType.STATION_FLIPPED.toString());
         final MultiBufferSource.BufferSource immediate = RenderTrains.shouldNotRender(pos, RenderTrains.maxTrainRenderDistance / 2, null) ? null : MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         if (vertexConsumers != null && isExit) {
-            final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
+            final KSDStation station = KSDRailwayData.getStation(KSDClientData.STATIONS, pos);
             if (station == null) {
                 return;
             }
             final Map<String, List<String>> exits = station.getGeneratedExits();
-            final List<String> selectedExitsSorted = selectedIds.stream().map(Station::deserializeExit).filter(exits::containsKey).sorted(String::compareTo).toList();
+            final List<String> selectedExitsSorted = selectedIds.stream().map(KSDStation::deserializeExit).filter(exits::containsKey).sorted(String::compareTo).toList();
             matrices.pushPose();
             matrices.translate(x + margin + (flipCustomText ? signSize : 0), y + margin, 0);
             final float maxWidth = ((flipCustomText ? maxWidthLeft : maxWidthRight) + 1) * size - margin * 2;
@@ -166,7 +168,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
             for (int i = 0; i < selectedExitsSorted.size(); i++) {
                 final String selectedExit = selectedExitsSorted.get(flipCustomText ? selectedExitsSorted.size() - i - 1 : i);
                 final float offset = (flipCustomText ? -1 : 1) * signSize * i - (flipCustomText ? signSize : 0);
-                RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getExitSignLetter(selectedExit.substring(0, 1), selectedExit.substring(1), backgroundColor).resourceLocation, true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
+                RenderTrains.scheduleRender(KSDClientData.DATA_CACHE.getExitSignLetter(selectedExit.substring(0, 1), selectedExit.substring(1), backgroundColor).resourceLocation, true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
                     storedMatrixTransformations.transform(matricesNew);
                     matricesNew.translate(x + margin + (flipCustomText ? signSize : 0), y + margin, 0);
                     matricesNew.scale(Math.min(1, maxWidth / exitWidth), 1, 1);
@@ -179,11 +181,11 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
             }
             matrices.popPose();
         } else if (vertexConsumers != null && isLine) {
-            final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
+            final KSDStation station = KSDRailwayData.getStation(KSDClientData.STATIONS, pos);
             if (station == null) {
                 return;
             }
-            final Map<Integer, ClientCache.ColorNameTuple> routesInStation = ClientData.DATA_CACHE.getAllRoutesIncludingConnectingStations(station);
+            final Map<Integer, ClientCache.ColorNameTuple> routesInStation = KSDClientData.DATA_CACHE.getAllRoutesIncludingConnectingStations(station);
             final List<ClientCache.ColorNameTuple> selectedIdsSorted = selectedIds.stream().filter(selectedId -> RailwayData.isBetween(selectedId, Integer.MIN_VALUE, Integer.MAX_VALUE)).map(Math::toIntExact).filter(routesInStation::containsKey).map(routesInStation::get).sorted(Comparator.comparingInt(route -> route.color)).toList();
             final float maxWidth = Math.max(0, ((flipCustomText ? maxWidthLeft : maxWidthRight) + 1) * size - margin * 2);
             final float height = size - margin * 2;
@@ -215,11 +217,11 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
                 xOffset += width + margin / 2F;
             }
         } else if (vertexConsumers != null && isPlatform) {
-            final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
+            final KSDStation station = KSDRailwayData.getStation(KSDClientData.STATIONS, pos);
             if (station == null) {
                 return;
             }
-            final Map<Long, Platform> platformPositions = ClientData.DATA_CACHE.requestStationIdToPlatforms(station.id);
+            final Map<Long, KSDPlatform> platformPositions = KSDClientData.DATA_CACHE.requestStationIdToPlatforms(station.id);
             if (platformPositions != null) {
                 final List<Long> selectedIdsSorted = selectedIds.stream().filter(platformPositions::containsKey).sorted(Comparator.comparing(platformPositions::get)).toList();
                 final int selectedCount = selectedIdsSorted.size();
@@ -230,7 +232,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
                     final float bottomOffset = (i + 1) * height + extraMargin;
                     final float left = flipCustomText ? x - maxWidthLeft * size : x + margin;
                     final float right = flipCustomText ? x + size - margin : x + (maxWidthRight + 1) * size;
-                    RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getDirectionArrow(selectedIdsSorted.get(i),
+                    RenderTrains.scheduleRender(KSDClientData.DATA_CACHE.getDirectionArrow(selectedIdsSorted.get(i),
                                     false,
                                     false,
                                     flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT,
@@ -289,7 +291,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
     }
 
     private static void renderCustomText(String signText, StoredMatrixTransformations storedMatrixTransformations, Direction facing, float size, float start, boolean flipCustomText, float maxWidth, int backgroundColor) {
-        final IVRClientCache.DynamicResource dynamicResource = IVRClientData.DATA_CACHE.getSignText(signText, flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT, (1 - BlockModernSign.SMALL_SIGN_PERCENTAGE) / 2, backgroundColor, ARGB_WHITE);
+        final KSDClientCache.DynamicResource dynamicResource = KSDClientData.DATA_CACHE.getSignText(signText, flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT, (1 - BlockModernSign.SMALL_SIGN_PERCENTAGE) / 2, backgroundColor, ARGB_WHITE);
         final float width = Math.min(size * dynamicResource.width / dynamicResource.height, maxWidth);
         RenderTrains.scheduleRender(dynamicResource.resourceLocation, true, RenderTrains.QueuedRenderLayer.LIGHT_TRANSLUCENT, (matricesNew, vertexConsumer) -> {
             storedMatrixTransformations.transform(matricesNew);
@@ -300,7 +302,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
 
     public static CustomResources.CustomSign getSign(String signId) {
         try {
-            final BlockModernSign.SignType sign = BlockModernSign.SignType.valueOf(signId);
+            final BlockRailwaySign.SignType sign = BlockRailwaySign.SignType.valueOf(signId);
             return new CustomResources.CustomSign(sign.textureId, sign.flipTexture, sign.customText, sign.flipCustomText, sign.small, sign.backgroundColor);
         } catch (Exception ignored) {
             return signId == null ? null : CustomResources.CUSTOM_SIGNS.get(signId);
@@ -324,6 +326,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
 
     @FunctionalInterface
     public interface DrawTexture {
+
         void drawTexture(ResourceLocation textureId, float x, float y, float size, boolean flipTexture);
     }
 }

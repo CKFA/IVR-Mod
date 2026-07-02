@@ -1,10 +1,12 @@
 package net.hulan.ivr.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import mtr.client.ClientData;
+import mtr.block.BlockRailwaySign;
 import mtr.client.CustomResources;
 import mtr.client.IDrawing;
-import mtr.data.*;
+import mtr.data.DataConverter;
+import mtr.data.IGui;
+import mtr.data.NameColorDataBase;
 import mtr.mappings.ScreenMapper;
 import mtr.mappings.Text;
 import mtr.mappings.UtilitiesClient;
@@ -13,6 +15,10 @@ import net.hulan.ivr.block.BlockModernSign;
 import net.hulan.ivr.block.BlockKCRRouteSignBase;
 import net.hulan.ivr.packet.IVRPacketTrainDataGuiClient;
 import net.hulan.ivr.render.RenderModernSign;
+import net.hulan.ksd.client.KSDClientData;
+import net.hulan.ksd.data.KSDPlatform;
+import net.hulan.ksd.data.KSDRailwayData;
+import net.hulan.ksd.data.KSDStation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
@@ -60,27 +66,27 @@ public class ModernSignScreen extends ScreenMapper implements IGui {
         editingIndex = -1;
         this.signPos = signPos;
         final ClientLevel world = Minecraft.getInstance().level;
-        for (final BlockModernSign.SignType signType : BlockModernSign.SignType.values()) {
+        for (final BlockRailwaySign.SignType signType : BlockRailwaySign.SignType.values()) {
             allSignIds.add(signType.toString());
         }
         final List<String> sortedKeys = new ArrayList<>(CustomResources.CUSTOM_SIGNS.keySet());
         Collections.sort(sortedKeys);
         allSignIds.addAll(sortedKeys);
         try {
-            final Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, signPos);
+            final KSDStation station = KSDRailwayData.getStation(KSDClientData.STATIONS, signPos);
             if (station != null) {
                 final Map<String, List<String>> exits = station.getGeneratedExits();
                 final List<String> exitParents = new ArrayList<>(exits.keySet());
                 exitParents.sort(String::compareTo);
                 exitParents.forEach(exitParent -> {
                     final List<String> destinations = exits.get(exitParent);
-                    exitsForList.add(new DataConverter(Station.serializeExit(exitParent), exitParent + " " + (!destinations.isEmpty() ? destinations.get(0) : ""), 0));
+                    exitsForList.add(new DataConverter(KSDStation.serializeExit(exitParent), exitParent + " " + (!destinations.isEmpty() ? destinations.get(0) : ""), 0));
                 });
-                final List<Platform> platforms = new ArrayList<>(ClientData.DATA_CACHE.requestStationIdToPlatforms(station.id).values());
+                final List<KSDPlatform> platforms = new ArrayList<>(KSDClientData.DATA_CACHE.requestStationIdToPlatforms(station.id).values());
                 Collections.sort(platforms);
-                platforms.stream().map(platform -> new DataConverter(platform.id, platform.name + " " + IGui.mergeStations(ClientData.DATA_CACHE.requestPlatformIdToRoutes(platform.id).stream().map(route -> route.stationDetails.get(route.stationDetails.size() - 1).stationName).collect(Collectors.toList())), 0)).forEach(platformsForList::add);
-                ClientData.DATA_CACHE.getAllRoutesIncludingConnectingStations(station).forEach((color, route) -> routesForList.add(new DataConverter(route.color, route.name, route.color)));
-                ClientData.DATA_CACHE.getConnectingStationsIncludingThisOne(station).forEach(connectingStation -> stationsForList.add(new DataConverter(connectingStation.id, connectingStation.name, connectingStation.color)));
+                platforms.stream().map(platform -> new DataConverter(platform.id, platform.name + " " + IGui.mergeStations(KSDClientData.DATA_CACHE.requestPlatformIdToRoutes(platform.id).stream().map(route -> route.stationDetails.get(route.stationDetails.size() - 1).stationName).collect(Collectors.toList())), 0)).forEach(platformsForList::add);
+                KSDClientData.DATA_CACHE.getAllRoutesIncludingConnectingStations(station).forEach((color, route) -> routesForList.add(new DataConverter(route.color, route.name, route.color)));
+                KSDClientData.DATA_CACHE.getConnectingStationsIncludingThisOne(station).forEach(connectingStation -> stationsForList.add(new DataConverter(connectingStation.id, connectingStation.name, connectingStation.color)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -291,10 +297,10 @@ public class ModernSignScreen extends ScreenMapper implements IGui {
     private void setNewSignId(String newSignId) {
         if (editingIndex >= 0 && editingIndex < signIds.length) {
             signIds[editingIndex] = newSignId;
-            final boolean isExitLetter = newSignId != null && (newSignId.equals(BlockModernSign.SignType.EXIT_LETTER.toString()) || newSignId.equals(BlockModernSign.SignType.EXIT_LETTER_FLIPPED.toString()));
-            final boolean isPlatform = newSignId != null && (newSignId.equals(BlockModernSign.SignType.PLATFORM.toString()) || newSignId.equals(BlockModernSign.SignType.PLATFORM_FLIPPED.toString()));
-            final boolean isLine = newSignId != null && (newSignId.equals(BlockModernSign.SignType.LINE.toString()) || newSignId.equals(BlockModernSign.SignType.LINE_FLIPPED.toString()));
-            final boolean isStation = newSignId != null && (newSignId.equals(BlockModernSign.SignType.STATION.toString()) || newSignId.equals(BlockModernSign.SignType.STATION_FLIPPED.toString()));
+            final boolean isExitLetter = newSignId != null && (newSignId.equals(BlockRailwaySign.SignType.EXIT_LETTER.toString()) || newSignId.equals(BlockRailwaySign.SignType.EXIT_LETTER_FLIPPED.toString()));
+            final boolean isPlatform = newSignId != null && (newSignId.equals(BlockRailwaySign.SignType.PLATFORM.toString()) || newSignId.equals(BlockRailwaySign.SignType.PLATFORM_FLIPPED.toString()));
+            final boolean isLine = newSignId != null && (newSignId.equals(BlockRailwaySign.SignType.LINE.toString()) || newSignId.equals(BlockRailwaySign.SignType.LINE_FLIPPED.toString()));
+            final boolean isStation = newSignId != null && (newSignId.equals(BlockRailwaySign.SignType.STATION.toString()) || newSignId.equals(BlockRailwaySign.SignType.STATION_FLIPPED.toString()));
             if ((isExitLetter || isPlatform || isLine || isStation) && minecraft != null) {
                 UtilitiesClient.setScreen(minecraft, new DashboardListSelectorScreen(this, isExitLetter ? exitsForList : isPlatform ? platformsForList : isLine ? routesForList : stationsForList, selectedIds, false, false));
             }
@@ -303,7 +309,7 @@ public class ModernSignScreen extends ScreenMapper implements IGui {
 
     private void setLuminance(boolean luminance) {
         if (isModernSign) this.luminance = luminance;
-        buttonLight.setMessage(Text.translatable("gui.ivr.cycle_light").append(Text.translatable(this.luminance ? "options.mtr.on" : "options.mtr.off")));
+        buttonLight.setMessage(Text.translatable("gui.ivr.cycle_light").append(Text.translatable(luminance ? "options.mtr.on" : "options.mtr.off")));
     }
 
     private void setPage(int newPage) {
@@ -314,6 +320,7 @@ public class ModernSignScreen extends ScreenMapper implements IGui {
 
     @FunctionalInterface
     private interface LoopSignsCallback {
+
         void loopSignsCallback(int index, int x, int y, boolean isBig);
     }
 }

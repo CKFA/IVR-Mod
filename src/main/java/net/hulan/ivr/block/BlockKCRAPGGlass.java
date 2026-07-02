@@ -53,6 +53,7 @@ public class BlockKCRAPGGlass extends BlockPSDAPGGlassBase implements EntityBloc
     }
 
     public static class TileEntityKCRAPGGlass extends BlockKCRPSDTop.TileEntityKCRRouteBase {
+
         public TileEntityKCRAPGGlass(BlockPos pos, BlockState state) {
             super(IVRBlockEntityTypes.KCR_APG_GLASS_TILE_ENTITY.get(), pos, state);
         }

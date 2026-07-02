@@ -7,7 +7,7 @@ import mtr.render.RenderTrains;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockKCRStationNameBase;
 import net.hulan.ivr.block.BlockKCRStationNameEntrance;
-import net.hulan.ivr.client.IVRClientData;
+import net.hulan.ksd.client.KSDClientData;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
@@ -33,13 +33,13 @@ public class RenderKCRStationNameTiled<T extends BlockKCRStationNameBase.TileEnt
         if (this.showLogo) {
             int propagateProperty = IBlock.getStatePropertySafe(world, pos, BlockKCRStationNameEntrance.STYLE);
             float logoSize = propagateProperty % 2 == 0 ? 0.5F : 1.0F;
-            RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getStationNameEntrance(propagateProperty >= 2 && propagateProperty < 4 ? -16777216 : -1, IGui.insertTranslation("gui.mtr.station_cjk", "gui.mtr.station", 1, stationName), (float)totalLength / logoSize).resourceLocation, false, RenderTrains.QueuedRenderLayer.INTERIOR, (matrices, vertexConsumer) -> {
+            RenderTrains.scheduleRender(KSDClientData.DATA_CACHE.getStationNameEntrance(propagateProperty >= 2 && propagateProperty < 4 ? -16777216 : -1, IGui.insertTranslation("gui.mtr.station_cjk", "gui.mtr.station", 1, stationName), (float)totalLength / logoSize).resourceLocation, false, RenderTrains.QueuedRenderLayer.INTERIOR, (matrices, vertexConsumer) -> {
                 storedMatrixTransformations.transform(matrices);
                 IDrawing.drawTexture(matrices, vertexConsumer, -0.5F, -logoSize / 2.0F, 1.0F, logoSize, (float)(lengthLeft - 1) / (float)totalLength, 0.0F, (float)lengthLeft / (float)totalLength, 1.0F, facing, color, light);
                 matrices.popPose();
             });
         } else {
-            RenderTrains.scheduleRender(IVRClientData.DATA_CACHE.getStationName(stationName, (float)totalLength).resourceLocation, false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
+            RenderTrains.scheduleRender(KSDClientData.DATA_CACHE.getStationName(stationName, (float)totalLength).resourceLocation, false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matrices, vertexConsumer) -> {
                 storedMatrixTransformations.transform(matrices);
                 IDrawing.drawTexture(matrices, vertexConsumer, -0.5F, -0.5F, 1.0F, 1.0F, (float)(lengthLeft - 1) / (float)totalLength, 0.0F, (float)lengthLeft / (float)totalLength, 1.0F, facing, color, light);
                 matrices.popPose();

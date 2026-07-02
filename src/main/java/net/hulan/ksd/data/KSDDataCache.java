@@ -14,6 +14,7 @@ import java.util.Set;
 
 public class KSDDataCache {
 
+    private long lastRefreshedTime;
     public final Map<Long, KSDStation> stationIdMap = new HashMap<>();
     public final Map<Long, KSDPlatform> platformIdMap = new HashMap<>();
     public final Map<Long, KSDRoute> routeIdMap = new HashMap<>();
@@ -56,6 +57,11 @@ public class KSDDataCache {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        lastRefreshedTime = System.currentTimeMillis();
+    }
+
+    public boolean needsRefresh(long cachedRefreshTime) {
+        return this.lastRefreshedTime > cachedRefreshTime;
     }
 
     protected void syncAdditional() {

@@ -2,17 +2,17 @@ package net.hulan.ivr.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import mtr.block.IBlock;
-import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
-import mtr.data.RailwayData;
-import mtr.data.Station;
 import mtr.mappings.BlockEntityRendererMapper;
 import mtr.mappings.Text;
 import mtr.mappings.UtilitiesClient;
 import mtr.render.RenderRouteBase;
 import mtr.render.StoredMatrixTransformations;
 import net.hulan.ivr.block.BlockKCRStationNameBase;
+import net.hulan.ksd.client.KSDClientData;
+import net.hulan.ksd.data.KSDRailwayData;
+import net.hulan.ksd.data.KSDStation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
@@ -40,7 +40,7 @@ public abstract class RenderKCRStationNameBase<T extends BlockKCRStationNameBase
                 UtilitiesClient.rotateYDegrees(matricesNew, -facing.toYRot());
                 UtilitiesClient.rotateZDegrees(matricesNew, 180.0F);
             });
-            Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
+            final KSDStation station = KSDRailwayData.getStation(KSDClientData.STATIONS, pos);
             for(int i = 0; i < (entity.isDoubleSided ? 2 : 1); ++i) {
                 StoredMatrixTransformations storedMatrixTransformations2 = storedMatrixTransformations.copy();
                 boolean shouldFlip = i == 1;

@@ -60,7 +60,7 @@ public class RenderKCRPSDAPGDoor<T extends BlockPSDAPGDoorBase.TileEntityPSDAPGD
                 boolean half = IBlock.getStatePropertySafe(world, pos, BlockPSDAPGDoorBase.HALF) == DoubleBlockHalf.UPPER;
                 boolean end = IBlock.getStatePropertySafe(world, pos, BlockPSDAPGDoorBase.END);
                 boolean unlocked = IBlock.getStatePropertySafe(world, pos, BlockPSDAPGDoorBase.UNLOCKED);
-                float open = Math.min(entity.getOpen(MTRClient.getLastFrameDuration()), this.type >= 3 ? 0.75F : 1.0F);
+                float open = Math.min(entity.getOpen(MTRClient.getLastFrameDuration()), type >= 3 ? 0.75F : 1.0F);
                 StoredMatrixTransformations storedMatrixTransformations = new StoredMatrixTransformations();
                 storedMatrixTransformations.add((matricesNew) -> {
                     matricesNew.translate(0.5D + (double)entity.getBlockPos().getX(), entity.getBlockPos().getY(), 0.5D + (double)entity.getBlockPos().getZ());
@@ -68,7 +68,7 @@ public class RenderKCRPSDAPGDoor<T extends BlockPSDAPGDoorBase.TileEntityPSDAPGD
                     UtilitiesClient.rotateXDegrees(matricesNew, 180.0F);
                 });
                 StoredMatrixTransformations storedMatrixTransformationsLight = storedMatrixTransformations.copy();
-                switch(this.type) {
+                switch(type) {
                     case 0:
                     case 1:
                         if (half) {
@@ -79,7 +79,7 @@ public class RenderKCRPSDAPGDoor<T extends BlockPSDAPGDoorBase.TileEntityPSDAPGD
                             });
                         }
                         if (end) {
-                            RenderTrains.scheduleRender(new ResourceLocation(String.format("%s:textures/block/%s" + "psd_door_end_%s_%s_2_%s.png", this.type == 1 ? "ivr" : "mtr", this.type == 1 ? "kcr_" : "", half ? "top" : "bottom", side ? "right" : "left", this.type == 1 ? "2" : "1")), false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matricesNew, vertexConsumer) -> {
+                            RenderTrains.scheduleRender(new ResourceLocation(String.format("%s:textures/block/%s" + "psd_door_end_%s_%s_2_%s.png", type == 1 ? "ivr" : "mtr", this.type == 1 ? "kcr_" : "", half ? "top" : "bottom", side ? "right" : "left", this.type == 1 ? "2" : "1")), false, RenderTrains.QueuedRenderLayer.EXTERIOR, (matricesNew, vertexConsumer) -> {
                                 storedMatrixTransformationsLight.transform(matricesNew);
                                 matricesNew.translate(open / 2.0F * (float)(side ? -1 : 1), 0.0D, 0.0D);
                                 (side ? MODEL_PSD_END_RIGHT_2 : MODEL_PSD_END_LEFT_2).renderToBuffer(matricesNew, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
