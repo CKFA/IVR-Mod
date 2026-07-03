@@ -40,8 +40,8 @@ public class BlockKCRFirstClassProcessor extends BlockDirectionalMapper {
         if (!world.isClientSide) {
             FirstClassValidationSystem.FirstClassState firstClassState = FirstClassValidationSystem.validateOnMachine(blockPos, world, player);
             switch (firstClassState) {
-                case ENABLED_ACCESS, ENABLED_ACCESS_CONCESSIONARY -> world.setBlockAndUpdate(blockPos, blockState.setValue(TYPE, 1));
-                case NEGATIVE_AFTER_EXIT, NEGATIVE_AFTER_EXIT_CONCESSIONARY -> world.setBlockAndUpdate(blockPos, blockState.setValue(TYPE, 2));
+                case ENABLED_ACCESS -> world.setBlockAndUpdate(blockPos, blockState.setValue(TYPE, 1));
+                case ENABLED_ACCESS_CONCESSIONARY -> world.setBlockAndUpdate(blockPos, blockState.setValue(TYPE, 2));
                 case DENIED -> world.setBlockAndUpdate(blockPos, blockState.setValue(TYPE, 3));
             }
             Utilities.scheduleBlockTick(world, blockPos, this, 20);

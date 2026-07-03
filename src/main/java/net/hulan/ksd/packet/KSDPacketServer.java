@@ -8,6 +8,7 @@ import mtr.data.TicketSystem;
 import mtr.data.TransportMode;
 import mtr.packet.PacketTrainDataBase;
 import net.hulan.ksd.data.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -29,10 +30,10 @@ public class KSDPacketServer extends PacketTrainDataBase implements KSDPacket {
         Registry.sendToPlayer(player, KSD_PACKET_OPEN_KSD_DASHBOARD_SCREEN, packet);
     }
 
-    public static void openTicketMachineScreenS2C(Level world, ServerPlayer player) {
+    public static void openKCRTicketMachineScreenS2C(ServerPlayer player, BlockPos machinePos) {
         FriendlyByteBuf packet = new FriendlyByteBuf(Unpooled.buffer());
-        packet.writeInt(TicketSystem.getPlayerScore(world, player, "mtr_balance").getScore());
-        Registry.sendToPlayer(player, KSD_PACKET_OPEN_TICKET_MACHINE_SCREEN, packet);
+        packet.writeBlockPos(machinePos);
+        Registry.sendToPlayer(player, KSD_PACKET_OPEN_KCR_TICKET_MACHINE_SCREEN, packet);
     }
 
     public static void sendAllInChunks(ServerPlayer player, Set<KSDStation> stations, Set<KSDPlatform> platforms, Set<KSDRoute> routes) {

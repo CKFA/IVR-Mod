@@ -21,7 +21,7 @@ public class BlockTicketMachineMixin {
     @Inject(method = "use", at = @At("HEAD"))
     private void use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
         if (!world.isClientSide) {
-            KSDPacketServer.openTicketMachineScreenS2C(world, (ServerPlayer)player);
+            //KSDPacketServer.openTicketMachineScreenS2C(world, (ServerPlayer)player);
         }
     }
 }

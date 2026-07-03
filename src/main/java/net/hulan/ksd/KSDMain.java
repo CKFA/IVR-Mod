@@ -45,7 +45,8 @@ public class KSDMain implements ModInitializer, KSDBlocks, KSDItems, KSDCreative
         registerItem.accept("kp_cell_side_is", KP_CELL_SIDE_IS);
         registerItem.accept("kp_cell_side_os", KP_CELL_SIDE_OS);
         registerItem.accept("kp_cell_side_os_with_light", KP_CELL_SIDE_OS_WITH_LIGHT);
-        registerItem.accept("octopus", OCTOPUS);
+        registerItem.accept("ksd_dashboard", KSD_DASHBOARD);
+        //registerItem.accept("octopus", OCTOPUS);
         registerBlockItem.accept("kp_pole_normal", KP_POLE_NORMAL, KCR_PLATFORM_BLOCKS);
         registerBlockItem.accept("kp_pole_single_side", KP_POLE_1_SIDE, KCR_PLATFORM_BLOCKS);
         registerBlockItem.accept("kp_pole_double_side", KP_POLE_2_SIDE, KCR_PLATFORM_BLOCKS);
@@ -58,7 +59,6 @@ public class KSDMain implements ModInitializer, KSDBlocks, KSDItems, KSDCreative
         registerBlockItem.accept("kp_cell_top", KP_CELL_TOP, KCR_PLATFORM_BLOCKS);
         registerBlockItem.accept("kp_cell_light", KP_LIGHT, KCR_PLATFORM_BLOCKS);
         registerBlockItem.accept("first_class_processor", FIRST_CLASS_PROCESSOR, KCR_PLATFORM_BLOCKS);
-        registerItem.accept("ksd_dashboard", KSD_DASHBOARD);
         mtr.Registry.registerNetworkReceiver(KSD_PACKET_UPDATE_STATION,
                 (minecraftServer, player, packet) -> KSDPacketServer.receiveUpdateOrDeleteC2S(minecraftServer,
                         player,

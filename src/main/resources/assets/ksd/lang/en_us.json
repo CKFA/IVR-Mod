@@ -1,8 +1,9 @@
 {
-  "itemGroup.kcr.kcr_platform_blocks": "KCR Platform Blocks",
+  "itemGroup.ksd.kcr_platform_blocks": "KCR Platform Decoration",
   "item.ksd.kp_cell_side_is": "Cell(Side,Inner)",
   "item.ksd.kp_cell_side_os": "Cell(Side,Outer)",
   "item.ksd.kp_cell_side_os_with_light": "Cell(Side,Outer With Light)",
+  "item.ksd.ksd_dashboard": "KSD Dashboard",
   "block.ksd.kp_pole_normal": "Pole(Normal)",
   "block.ksd.kp_pole_single_side": "Pole(Single Side)",
   "block.ksd.kp_pole_double_side": "Pole(Double Side)",
@@ -14,6 +15,7 @@
   "block.ksd.kp_hb_with_hb": "Crossbar(Horizontal,Horizontal)",
   "block.ksd.kp_cell_top": "Cell(Top)",
   "block.ksd.kp_cell_light": "Cell Light",
+  "block.ksd.first_class_processor": "KCR FirstClassProcessor",
   "gui.mtr.route_type_train_kcr_classical" : "Type: KCR Classical",
   "gui.mtr.route_type_train_kcr_modern" : "Type: KCR Modern",
   "gui.mtr.route_type_train_kcr_light_rail" : "Type: KCR Light Rail",

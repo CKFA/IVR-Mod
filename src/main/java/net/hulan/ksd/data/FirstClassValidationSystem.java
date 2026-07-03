@@ -65,13 +65,14 @@ public final class FirstClassValidationSystem {
                 carScore.setScore(0);
             } else {
                 int oldCar = carScore.getScore() - 1;
+                if (oldCar == newCar) return;
                 carScore.setScore(newCar + 1);
                 FirstClassPlayer firstClassPlayer = Utils.getFilteredValueFromDataSet(ksd.jsonDataManager.fps, f -> f.uuid.equals(player.getUUID()));
                 if (firstClassPlayer == null || oldCar == -1) continue;
-                long routeUd = ((TrainServerAccessor) playerTrain).getRouteId();
-                KSDRoute route = Utils.getFilteredValueFromDataSet(ksd.routes, r -> r.id == routeUd);
-                if (oldCar != newCar
-                        && route != null
+                long routeId = ((TrainServerAccessor) playerTrain).getRouteId();
+                KSDRoute route = Utils.getFilteredValueFromDataSet(ksd.routes, r -> r.id == routeId);
+                System.out.println(newCar + 1);
+                if (route != null
                         && route.routeType.name().equals("KCR_CLASSICAL")
                         && route.hasFirstClassService
                         && newCar == route.firstClassCar) {
@@ -133,36 +134,16 @@ public final class FirstClassValidationSystem {
         if (!isValidated(firstClassPlayer)) {
             firstClassPlayer.validatedStationId = validateStation.id;
             firstClassPlayer.routeId = route.id;
-            KSDStation firstStation = ksd.dataCache.platformIdToStation.get(route.getFirstPlatformId());
-            KSDStation lastStation = ksd.dataCache.platformIdToStation.get(route.getLastPlatformId());
-            int firstStationZone = firstStation.zone;
-            int lastStationZone = lastStation.zone;
-            int deltaZone = Math.max(
-                    Math.abs(firstStationZone - validateStation.zone),
-                    Math.abs(lastStationZone - validateStation.zone));
-            int firstClassFare = (BASE_FARE + ZONE_FARE * deltaZone) * 2;
             if (balance.getScore() < 0) {
                 firstClassPlayer.state = FirstClassState.DENIED;
                 playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_denied");
             } else {
                 if (isConcessionary(player)) {
-                    if (balance.getScore() - firstClassFare / 2 >= 0) {
-                        firstClassPlayer.state = FirstClassState.ENABLED_ACCESS_CONCESSIONARY;
-                        playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_enabled_access_concessionary");
-
-                    } else {
-                        firstClassPlayer.state = FirstClassState.NEGATIVE_AFTER_EXIT_CONCESSIONARY;
-                        playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_negative_concessionary");
-                    }
+                    firstClassPlayer.state = FirstClassState.ENABLED_ACCESS_CONCESSIONARY;
+                    playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_enabled_access_concessionary");
                 } else {
-                    if (balance.getScore() - firstClassFare >= 0) {
-                        firstClassPlayer.state = FirstClassState.ENABLED_ACCESS;
-                        playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_enabled_access");
-
-                    } else {
-                        firstClassPlayer.state = FirstClassState.NEGATIVE_AFTER_EXIT;
-                        playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_negative");
-                    }
+                    firstClassPlayer.state = FirstClassState.ENABLED_ACCESS;
+                    playSoundAndSendMessage(world, pos, player, "gui.ksd.first_class_enabled_access");
                 }
             }
             ksd.dataCache.sync();
@@ -206,9 +187,7 @@ public final class FirstClassValidationSystem {
 
     public static boolean isValidated(FirstClassPlayer firstClassPlayer) {
         return firstClassPlayer.state.equals(FirstClassState.ENABLED_ACCESS)
-                || firstClassPlayer.state.equals(FirstClassState.ENABLED_ACCESS_CONCESSIONARY)
-                || firstClassPlayer.state.equals(FirstClassState.NEGATIVE_AFTER_EXIT)
-                || firstClassPlayer.state.equals(FirstClassState.NEGATIVE_AFTER_EXIT_CONCESSIONARY);
+                || firstClassPlayer.state.equals(FirstClassState.ENABLED_ACCESS_CONCESSIONARY);
     }
 
     private static Score getPlayerScore(Level world, Player player, String objectiveName) {
@@ -368,8 +347,6 @@ public final class FirstClassValidationSystem {
         ILLEGALLY("illegally"),
         ENABLED_ACCESS("enabled_access"),
         ENABLED_ACCESS_CONCESSIONARY("enabled_access_concessionary"),
-        NEGATIVE_AFTER_EXIT("negative_after_exit"),
-        NEGATIVE_AFTER_EXIT_CONCESSIONARY("negative_after_exit_concessionary"),
         DENIED("denied");
 
         private final String name;

@@ -9,8 +9,10 @@ import mtr.data.TransportMode;
 import mtr.mappings.UtilitiesClient;
 import mtr.packet.PacketTrainDataBase;
 import net.hulan.ksd.client.KSDClientData;
+import net.hulan.ksd.sreen.KCRTicketMachineScreen;
 import net.hulan.ksd.sreen.KSDDashboardScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
@@ -31,6 +33,15 @@ public class KSDPacketClient extends PacketTrainDataBase implements KSDPacket {
         minecraftClient.execute(() -> {
             if (!(minecraftClient.screen instanceof KSDDashboardScreen)) {
                 UtilitiesClient.setScreen(minecraftClient, new KSDDashboardScreen(transportMode, useTimeAndWindSync));
+            }
+        });
+    }
+
+    public static void openKCRTicketMachineScreenS2C(Minecraft minecraftClient, FriendlyByteBuf packet) {
+        BlockPos blockPos = packet.readBlockPos();
+        minecraftClient.execute(() -> {
+            if (!(minecraftClient.screen instanceof KCRTicketMachineScreen)) {
+                UtilitiesClient.setScreen(minecraftClient, new KCRTicketMachineScreen(blockPos));
             }
         });
     }
