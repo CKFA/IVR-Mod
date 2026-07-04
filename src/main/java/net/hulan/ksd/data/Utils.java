@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.Predicate;import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -54,12 +54,20 @@ public class Utils {
         return dataCollection.stream().filter(filter).toList();
     }
 
+    public static <T> Set<T> getFilteredSetFromDataCollection(Collection<T> dataCollection, Predicate<T> filter) {
+        return dataCollection.stream().filter(filter).collect(Collectors.toSet());
+    }
+
     public static <T, R> List<R> getSortedAndMappedListFromDataCollection(Collection<T> dataCollection, Function<T, R> mapper) {
         return dataCollection.stream().sorted().map(mapper).toList();
     }
     
-    public static <T, R> List<R> getMappedListFromDataCollection(List<T> dataCollection, Function<T, R> mapper) {
+    public static <T, R> List<R> getMappedListFromDataCollection(Collection<T> dataCollection, Function<T, R> mapper) {
         return dataCollection.stream().map(mapper).toList();
+    }
+
+    public static <T, R> Set<R> getMappedSetFromDataCollection(Collection<T> dataCollection, Function<T, R> mapper) {
+        return dataCollection.stream().map(mapper).collect(Collectors.toSet());
     }
 
     public static <T, R> List<R> getMappedAndNonNullListFromDataCollection(Collection<T> dataCollection, Function<T, R> mapper) {
@@ -68,5 +76,9 @@ public class Utils {
 
     public static <T, R> List<R> getMappedAndFilteredListFromDataCollection(Collection<T> dataCollection, Function<T, R> mapper, Predicate<R> filter) {
         return dataCollection.stream().map(mapper).filter(filter).toList();
+    }
+
+    public static <T, R> Set<R> getMappedAndFilteredSetFromDataCollection(Collection<T> dataCollection, Function<T, R> mapper, Predicate<R> filter) {
+        return dataCollection.stream().map(mapper).filter(filter).collect(Collectors.toSet());
     }
 }

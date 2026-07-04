@@ -1,9 +1,7 @@
 package net.hulan.ksd.data;
 
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import mtr.data.NameColorDataBase;
-import mtr.data.RailwayDataRouteFinderModule;
 import mtr.data.SavedRailBase;
 import net.minecraft.core.BlockPos;
 
@@ -22,7 +20,6 @@ public class KSDDataCache {
     public final Map<KSDStation, Set<KSDStation>> stationIdToConnectingStations = new HashMap<>();
     public final Map<BlockPos, KSDStation> blockPosToStation = new HashMap<>();
     public final Long2LongOpenHashMap blockPosToPlatformId = new Long2LongOpenHashMap();
-    public final Long2ObjectOpenHashMap<Long2ObjectOpenHashMap<RailwayDataRouteFinderModule.ConnectionDetails>> platformConnections = new Long2ObjectOpenHashMap<>();
     protected final Set<KSDStation> stations;
     protected final Set<KSDPlatform> platforms;
     protected final Set<KSDRoute> routes;
@@ -39,7 +36,6 @@ public class KSDDataCache {
             mapIds(platformIdMap, platforms);
             mapIds(routeIdMap, routes);
             routes.forEach(route -> route.platformIds.removeIf(platformId -> !platformIdMap.containsKey(platformId.platformId)));
-            platformConnections.clear();
             stationIdToConnectingStations.clear();
             stations.forEach(station1 -> {
                 stationIdToConnectingStations.put(station1, new HashSet<>());

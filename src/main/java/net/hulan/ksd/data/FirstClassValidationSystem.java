@@ -10,6 +10,7 @@ import net.hulan.ksd.mixin.TrainServerAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -19,7 +20,6 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public final class FirstClassValidationSystem {
 
@@ -70,13 +70,20 @@ public final class FirstClassValidationSystem {
                 FirstClassPlayer firstClassPlayer = Utils.getFilteredValueFromDataSet(ksd.jsonDataManager.fps, f -> f.uuid.equals(player.getUUID()));
                 if (firstClassPlayer == null || oldCar == -1) continue;
                 long routeId = ((TrainServerAccessor) playerTrain).getRouteId();
+                KSDStation enteredStation = Utils.getFilteredValueFromDataSet(ksd.stations, s -> s.id == firstClassPlayer.enteredStationId);
+                if (enteredStation == null) continue;
                 KSDRoute route = Utils.getFilteredValueFromDataSet(ksd.routes, r -> r.id == routeId);
                 System.out.println(newCar + 1);
                 if (route != null
                         && route.routeType.name().equals("KCR_CLASSICAL")
                         && route.hasFirstClassService
                         && newCar == route.firstClassCar) {
-                    KSDStation firstStation = ksd.dataCache.platformIdToStation.get(route.getFirstPlatformId());
+                    KSDStation firstStation;
+                    if (isInRoute(ksd.dataCache.platformIdToStation, firstClassPlayer.enteredStationId, route)) {
+                        firstStation = enteredStation;
+                    } else if ((firstStation = getNearestInterchangeStation(ksd, route,  firstClassPlayer.enteredStationId)) == null){
+                        firstStation = ksd.dataCache.platformIdToStation.get(route.getFirstPlatformId());
+                    }
                     validate(ksd, world, player, player.blockPosition(), firstStation, route);
                 }
             }
@@ -161,7 +168,6 @@ public final class FirstClassValidationSystem {
             KSDStation enteredStation = Utils.getFilteredValueFromDataSet(railwayData.stations, s -> s.id == firstClassPlayer.enteredStationId);
             KSDStation validatedStation = Utils.getFilteredValueFromDataSet(railwayData.stations, s -> s.id == firstClassPlayer.validatedStationId);
             KSDRoute route = Utils.getFilteredValueFromDataSet(railwayData.routes, r -> r.id == firstClassPlayer.routeId);
-            System.out.println(firstClassPlayer.state);
             if (!firstClassPlayer.state.equals(FirstClassState.MTR) && enteredStation != null) {
                 final int fare;
                 if (firstClassPlayer.state.equals(FirstClassState.ILLEGALLY) && validatedStation == null) {
@@ -206,22 +212,18 @@ public final class FirstClassValidationSystem {
     }
 
     private static int getFare(KSDRailwayData railwayData, KSDStation enteredStation, KSDStation exitStation, KSDRoute route, Player player) {
+        KSDStation interchangeStation;
         final int entryZone = enteredStation.zone;
         final int exitZone = exitStation.zone;
-        KSDStation interchangeStation;
         Map<Long, KSDStation> platformIdToStation = railwayData.dataCache.platformIdToStation;
-        if (isInRoute(platformIdToStation, exitStation, route)) {
+        if (isInRoute(platformIdToStation, exitStation.id, route)) {
             return getMTRFare(entryZone, exitZone, player) * 2;
-        } else if ((interchangeStation = getInterchangeStation(platformIdToStation, exitStation, route)) != null) {
-            final int fcFare = getMTRFare(entryZone, interchangeStation.zone, player) * 2;
-            final int mtrFare = getMTRFare(exitZone, interchangeStation.zone, player);
-            return fcFare + mtrFare;
-        } else if ((interchangeStation = getNearestInterchangeStation(railwayData, route)) != null) {
+        } else if ((interchangeStation = getNearestInterchangeStation(railwayData, route, exitStation.id)) != null) {
             final int fcFare = getMTRFare(entryZone, interchangeStation.zone, player) * 2;
             final int mtrFare = getMTRFare(exitZone, interchangeStation.zone, player);
             return fcFare + mtrFare;
         }
-        return 114514;
+        return getMTRFare(entryZone, exitZone, player);
     }
 
     private static int getMTRFare(int entryZone, int exitZone, Player player) {
@@ -229,56 +231,35 @@ public final class FirstClassValidationSystem {
         return (isConcessionary(player) ? (int) Math.ceil(fare / 2F) : fare);
     }
 
-    private static boolean isInRoute(Map<Long, KSDStation> platformIdToStation, KSDStation station, KSDRoute route) {
-        for (Route.RoutePlatform platformId : route.platformIds) {
-            if (platformIdToStation.get(platformId.platformId).id == station.id) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isInRoute(Map<Long, KSDStation> platformIdToStation, long stationId, KSDRoute route) {
+        return getStationIdsInRoute(platformIdToStation, route).contains(stationId);
     }
 
-    private static KSDStation getInterchangeStation(Map<Long, KSDStation> platformIdToStation, KSDStation exitStation, KSDRoute route) {
-        Set<KSDRoute> routesInExitStation = stationIdToRoutes.get(exitStation.id);
-        KSDStation station;
-        for (KSDRoute r :  routesInExitStation) {
-            station = getInterchangeStation(platformIdToStation, route, r);
-            if (station != null) {
-                return station;
-            }
-        }
-        return null;
-    }
-
-    private static KSDStation getInterchangeStation(Map<Long, KSDStation> platformIdToStation, KSDRoute route, KSDRoute route1) {
-        for (Route.RoutePlatform platformId : route.platformIds) {
-            for (Route.RoutePlatform platformId1 : route1.platformIds) {
-                KSDStation station = platformIdToStation.get(platformId.platformId);
-                if (platformIdToStation.get(platformId1.platformId).id == station.id) {
-                    return station;
-                }
-            }
-        }
-        return null;
-    }
-
-    private static KSDStation getNearestInterchangeStation(KSDRailwayData railwayData, KSDRoute route) {
-        List<Route.RoutePlatform> platformIds = route.platformIds;
+    private static KSDStation getNearestInterchangeStation(KSDRailwayData railwayData, KSDRoute route, long currentStationId) {
         Map<Long, KSDStation> platformIdToStation = railwayData.dataCache.platformIdToStation;
-        AtomicReference<KSDStation> station = new AtomicReference<>(null);
-        railwayData.routes.forEach(route0 -> {
-            if (route0.id != route.id) {
-                List<Route.RoutePlatform> platformIds0 = route0.platformIds;
-                for (Route.RoutePlatform platformId : platformIds) {
-                    for (Route.RoutePlatform platformId0 : platformIds0) {
-                        if (platformIdToStation.get(platformId.platformId).id == platformIdToStation.get(platformId0.platformId).id) {
-                            station.set(platformIdToStation.get(platformId0.platformId));
-                        }
-                    }
-                }
-            }
-        });
-        return station.get();
+        if (!isInRoute(platformIdToStation, currentStationId, route)) return null;
+        Set<Long> interchangeStationIdsInRoute =
+                Utils.getFilteredSetFromDataCollection(getStationIdsInRoute(platformIdToStation, route),
+                        id -> stationIdToRoutes.get(id).size() >= 2);
+        interchangeStationIdsInRoute.removeIf(id -> id == currentStationId);
+        int currentIndex = getStationIndex(platformIdToStation, route, currentStationId);
+        long nearestInterchangeStationId = interchangeStationIdsInRoute.stream().min(Comparator.comparingInt(id -> getStationIndex(platformIdToStation, route, id) - currentIndex)).orElse(0L);
+        return Utils.getFilteredValueFromDataSet(railwayData.stations, s -> s.id == nearestInterchangeStationId);
+    }
+
+    private static Set<Long> getStationIdsInRoute(Map<Long, KSDStation> platformIdToStation, KSDRoute route) {
+        Set<Long> stations = new HashSet<>();
+        for (Route.RoutePlatform platformId : route.platformIds) {
+            stations.add(platformIdToStation.get(platformId.platformId).id);
+        }
+        return stations;
+    }
+
+    private static int getStationIndex(Map<Long, KSDStation> platformIdToStation, KSDRoute route, long stationId) {
+        for (int i = 0; i < route.platformIds.size(); i++) {
+            if (platformIdToStation.get(route.platformIds.get(i).platformId).id == stationId) return i;
+        }
+        return -1;
     }
 
     private static void playSoundAndSendMessage(Level world, BlockPos pos, Player player, String message) {
@@ -315,18 +296,18 @@ public final class FirstClassValidationSystem {
         Vec3 p2 = points[1];
         if (p1 == null || p2 == null) return false;
         Vec3 center = p1.add(p2).scale(0.5);
-        double halfLength = p1.distanceTo(p2) / 2;
-        Vec3 forward = p2.subtract(p1).normalize();
-        Vec3 up = new Vec3(0, 1, 0);
-        Vec3 right = up.cross(forward).normalize();
+        double dx = p2.x - p1.x;
+        double dz = p2.z - p1.z;
+        double dy = p2.y - p1.y;
+        float yaw = (float) Mth.atan2(dx, dz);
+        float pitch = (float) Math.asin(dy / p1.distanceTo(p2));
         Vec3 delta = player.position().subtract(center);
-        double localX = delta.dot(right);
-        double localZ = delta.dot(forward);
-        double localY = delta.y;
+        Vec3 local = delta.yRot(-yaw).xRot(-pitch);
+        double halfLength = p1.distanceTo(p2) / 2;
         double halfWidth = train.width / 2.0;
-        return Math.abs(localX) < halfWidth + 0.5 &&
-                Math.abs(localZ) < halfLength + 0.5 &&
-                localY >= -0.5 && localY <= 3.0;
+        return Math.abs(local.x) < halfWidth + 0.8F &&
+                Math.abs(local.z) < halfLength + 0.8F &&
+                local.y >= -0.5 && local.y <= 3.0;
     }
 
     private static Vec3[] getCarConnectionPoints(Train train, int carriageIndex) {
