@@ -295,7 +295,7 @@ public final class FirstClassValidationSystem {
         Vec3 p1 = points[0];
         Vec3 p2 = points[1];
         if (p1 == null || p2 == null) return false;
-        Vec3 center = p1.add(p2).scale(0.5);
+        Vec3 center = new Vec3((p1.x + p2.x) / 2, (p1.y + p2.y) / 2 + 1, (p1.z + p2.z) / 2);
         double dx = p2.x - p1.x;
         double dz = p2.z - p1.z;
         double dy = p2.y - p1.y;
@@ -305,8 +305,8 @@ public final class FirstClassValidationSystem {
         Vec3 local = delta.yRot(-yaw).xRot(-pitch);
         double halfLength = p1.distanceTo(p2) / 2;
         double halfWidth = train.width / 2.0;
-        return Math.abs(local.x) < halfWidth + 0.8F &&
-                Math.abs(local.z) < halfLength + 0.8F &&
+        return Math.abs(local.x) < halfWidth + 1.0F &&
+                Math.abs(local.z) < halfLength + 1.0F &&
                 local.y >= -0.5 && local.y <= 3.0;
     }
 
@@ -315,11 +315,12 @@ public final class FirstClassValidationSystem {
         int spacing = train.spacing;
         int trainCars = train.trainCars;
         boolean reversed = train.isReversed();
-        int physicalCarFront = reversed ? trainCars - 1 - carriageIndex : carriageIndex;
-        int physicalCarBack = physicalCarFront + 1;
-        Vec3 front = accessor.invokeGetRoutePosition(physicalCarFront, spacing);
-        Vec3 back = accessor.invokeGetRoutePosition(physicalCarBack, spacing);
-        return new Vec3[] {front, back};
+        Vec3[] positions = new Vec3[trainCars + 1];
+        for (int i = 0; i <= trainCars; i++) {
+            int idx = reversed ? trainCars - i : i;
+            positions[i] = accessor.invokeGetRoutePosition(idx, spacing);
+        }
+        return new Vec3[]{positions[carriageIndex], positions[carriageIndex + 1]};
     }
 
     public enum FirstClassState implements StringRepresentable {
