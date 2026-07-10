@@ -38,7 +38,7 @@ public abstract class BlockKCRRouteSignBase extends BlockDirectionalDoubleBlockB
     @SuppressWarnings("deprecation")
     @Override
     public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult hit) {
-        double y = hit.getBlockPos().getY();
+        double y = hit.getLocation().y;
         boolean isUpper = IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER;
         return IBlock.checkHoldingBrush(world, player, () -> {
             if (isUpper && y - Math.floor(y) > 0.8125D) {

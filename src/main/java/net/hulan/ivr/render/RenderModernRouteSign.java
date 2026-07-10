@@ -3,12 +3,8 @@ package net.hulan.ivr.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import mtr.block.IBlock;
-import mtr.client.ClientData;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
-import mtr.data.Platform;
-import mtr.data.RailwayData;
-import mtr.data.Station;
 import mtr.mappings.BlockEntityRendererMapper;
 import mtr.mappings.UtilitiesClient;
 import mtr.render.MoreRenderLayers;
@@ -16,6 +12,9 @@ import mtr.render.RenderTrains;
 import net.hulan.ivr.block.BlockKCRRouteSignBase;
 import net.hulan.ivr.block.BlockKCRStationNameBase;
 import net.hulan.ksd.client.KSDClientData;
+import net.hulan.ksd.data.KSDPlatform;
+import net.hulan.ksd.data.KSDRailwayData;
+import net.hulan.ksd.data.KSDStation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
@@ -42,11 +41,11 @@ public class RenderModernRouteSign<T extends BlockKCRRouteSignBase.TileEntityKCR
             if (!RenderTrains.shouldNotRender(pos, RenderTrains.maxTrainRenderDistance, facing)) {
                 boolean isTop = IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER;
                 int arrowDirection = IBlock.getStatePropertySafe(state, BlockKCRRouteSignBase.ARROW_DIRECTION);
-                Station station = RailwayData.getStation(ClientData.STATIONS, ClientData.DATA_CACHE, pos);
+                KSDStation station = KSDRailwayData.getStation(KSDClientData.STATIONS, pos);
                 if (station != null) {
-                    Map<Long, Platform> platformPositions = ClientData.DATA_CACHE.requestStationIdToPlatforms(station.id);
+                    Map<Long, KSDPlatform> platformPositions = KSDClientData.DATA_CACHE.requestStationIdToPlatforms(station.id);
                     if (platformPositions != null && !platformPositions.isEmpty()) {
-                        Platform platform = platformPositions.get(entity.getPlatformId());
+                        KSDPlatform platform = platformPositions.get(entity.getPlatformId());
                         if (platform != null) {
                             matrices.pushPose();
                             matrices.translate(0.5D, 0.0D, 0.5D);
@@ -64,10 +63,10 @@ public class RenderModernRouteSign<T extends BlockKCRRouteSignBase.TileEntityKCR
                                     -1,
                                     0).resourceLocation));
                             IDrawing.drawTexture(matrices, vertexConsumer1, 0.84375F, 0.96875F + (float)(isTop ? 0 : 1), 0.0F, 0.15625F, 0.8125F + (float)(isTop ? 0 : 1), 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, facing.getOpposite(), -1, light);
-                            VertexConsumer vertexConsumer2 = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(KSDClientData.DATA_CACHE.getRouteMapForRS(
+                            VertexConsumer vertexConsumer2 = vertexConsumers.getBuffer(MoreRenderLayers.getExterior(KSDClientData.DATA_CACHE.getRouteMap(
                                     platformId,
                                     true,
-                                    false,
+                                    true,
                                     1.6818181F,
                                     false).resourceLocation));
                             IDrawing.drawTexture(matrices, vertexConsumer2, 0.84375F, 0.8125F + (float)(isTop ? 0 : 1), 0.0F, 0.84375F, isTop ? 0.0F : 0.65625F, 0.0F, 0.15625F, isTop ? 0.0F : 0.65625F, 0.0F, 0.15625F, 0.8125F + (float)(isTop ? 0 : 1), 0.0F, 0.0F, 0.0F, isTop ? 0.7027027F : 1.0F, 1.0F, facing.getOpposite(), -1, light);

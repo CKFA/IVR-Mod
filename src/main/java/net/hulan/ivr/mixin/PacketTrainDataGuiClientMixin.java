@@ -5,6 +5,7 @@ import mtr.data.NameColorDataBase;
 import mtr.data.TransportMode;
 import mtr.packet.PacketTrainDataGuiClient;
 import net.hulan.ivr.IVR;
+import net.hulan.ksd.client.KSDClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -44,7 +45,7 @@ public class PacketTrainDataGuiClientMixin {
 
     @Inject(method = "receiveUpdateOrDeleteS2C", at = @At("TAIL"))
     private static <T extends NameColorDataBase> void receiveUpdateOrDeleteS2C(Minecraft minecraftClient, FriendlyByteBuf packet, Set<T> dataSet, Map<Long, T> cacheMap, BiFunction<Long, TransportMode, T> createDataWithId, boolean isDelete, CallbackInfo ci) {
-        ClientData.DATA_CACHE.sync();
-        ClientData.DATA_CACHE.refreshDynamicResources();
+        KSDClientData.DATA_CACHE.sync();
+        KSDClientData.DATA_CACHE.refreshDynamicResources();
     }
 }

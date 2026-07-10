@@ -328,25 +328,6 @@ public class KSDClientCache extends KSDDataCache {
                 transparentWhite ? DefaultRenderingColor.TRANSPARENT : DefaultRenderingColor.WHITE);
     }
 
-    public DynamicResource getRouteMapForRS(long platformId,
-                                                           boolean vertical,
-                                                           boolean flip,
-                                                           float aspectRatio,
-                                                           boolean transparentWhite) {
-        return getResource(String.format("route_map_for_rs_%s_%s_%s_%s_%s",
-                        platformId,
-                        vertical,
-                        flip,
-                        aspectRatio,
-                        transparentWhite),
-                () -> IVRRouteMapGenerator.generateRouteMapForRS(platformId,
-                        vertical,
-                        flip,
-                        aspectRatio,
-                        transparentWhite),
-                transparentWhite ? DefaultRenderingColor.TRANSPARENT : DefaultRenderingColor.WHITE);
-    }
-
     public byte[] getTextPixels(String text, int[] dimensions, int fontSizeCjk, int fontSize) {
         return getTextPixels(text, dimensions, 2147483647, (int)((float)Math.max(fontSizeCjk, fontSize) * 1.25F), fontSizeCjk, fontSize, 0, null);
     }

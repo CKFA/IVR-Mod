@@ -8,6 +8,7 @@ import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.RegistryUtilities;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.hulan.ksd.data.FirstClassValidationSystem;
 import net.hulan.ksd.data.KSDRailwayData;
@@ -15,10 +16,11 @@ import net.hulan.ksd.data.KSDRoute;
 import net.hulan.ksd.data.KSDStation;
 import net.hulan.ksd.packet.KSDPacket;
 import net.hulan.ksd.packet.KSDPacketServer;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.BlockItem;
+import net.minecraft.server.level.ServerPlayer;import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -131,6 +133,11 @@ public class KSDMain implements ModInitializer, KSDBlocks, KSDItems, KSDCreative
             the_nether = server.getLevel(Level.NETHER);
             the_end = server.getLevel(Level.END);
         });
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(Commands.literal("test").executes(context -> {
+            ServerPlayer player = context.getSource().getPlayerOrException();
+            KSDPacketServer.openKCRTicketMachineScreenS2C(player, player.blockPosition());
+            return 1;
+        })));
     }
 
     private static void registerItem(String path, RegistryObject<Item> item) {

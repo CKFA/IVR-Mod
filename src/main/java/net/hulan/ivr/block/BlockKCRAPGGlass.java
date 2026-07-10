@@ -34,7 +34,7 @@ public class BlockKCRAPGGlass extends BlockPSDAPGGlassBase implements EntityBloc
 
     @Override
     public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-        double y = blockHitResult.getBlockPos().getY();
+        double y = blockHitResult.getLocation().y;
         return IBlock.getStatePropertySafe(state, HALF) == DoubleBlockHalf.UPPER && y - Math.floor(y) > 0.21875D ? IBlock.checkHoldingBrush(world, player, () -> {
             world.setBlockAndUpdate(pos, state.cycle(ARROW_DIRECTION));
             propagate(world, pos, IBlock.getStatePropertySafe(state, FACING).getClockWise(), ARROW_DIRECTION, 3);

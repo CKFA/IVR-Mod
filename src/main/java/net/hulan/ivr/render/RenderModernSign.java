@@ -9,7 +9,6 @@ import mtr.block.BlockRailwaySign;
 import mtr.block.BlockStationNameBase;
 import mtr.block.IBlock;
 import mtr.client.ClientCache;
-import mtr.client.ClientData;
 import mtr.client.CustomResources;
 import mtr.client.IDrawing;
 import mtr.data.IGui;
@@ -189,10 +188,10 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
             final List<ClientCache.ColorNameTuple> selectedIdsSorted = selectedIds.stream().filter(selectedId -> RailwayData.isBetween(selectedId, Integer.MIN_VALUE, Integer.MAX_VALUE)).map(Math::toIntExact).filter(routesInStation::containsKey).map(routesInStation::get).sorted(Comparator.comparingInt(route -> route.color)).toList();
             final float maxWidth = Math.max(0, ((flipCustomText ? maxWidthLeft : maxWidthRight) + 1) * size - margin * 2);
             final float height = size - margin * 2;
-            final List<ClientCache.DynamicResource> ResourceLocationDataList = new ArrayList<>();
+            final List<KSDClientCache.DynamicResource> ResourceLocationDataList = new ArrayList<>();
             float totalTextWidth = 0;
             for (final ClientCache.ColorNameTuple route : selectedIdsSorted) {
-                final ClientCache.DynamicResource ResourceLocationData = ClientData.DATA_CACHE.getRouteSquare(route.color, route.name, flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT);
+                final KSDClientCache.DynamicResource ResourceLocationData = KSDClientData.DATA_CACHE.getRouteSquare(route.color, route.name, flipCustomText ? HorizontalAlignment.RIGHT : HorizontalAlignment.LEFT);
                 ResourceLocationDataList.add(ResourceLocationData);
                 totalTextWidth += height * ResourceLocationData.width / ResourceLocationData.height + margin / 2F;
             }
@@ -206,7 +205,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
                 storedMatrixTransformations2.add(matricesNew -> matricesNew.scale(maxWidth / finalTotalTextWidth, 1, 1));
             }
             float xOffset = 0;
-            for (final ClientCache.DynamicResource ResourceLocationData : ResourceLocationDataList) {
+            for (final KSDClientCache.DynamicResource ResourceLocationData : ResourceLocationDataList) {
                 final float width = height * ResourceLocationData.width / ResourceLocationData.height;
                 final float finalXOffset = xOffset;
                 RenderTrains.scheduleRender(ResourceLocationData.resourceLocation, true, RenderTrains.QueuedRenderLayer.INTERIOR, (matricesNew, vertexConsumer) -> {
@@ -277,7 +276,7 @@ public class RenderModernSign<T extends BlockModernSign.TileEntityModernSign> ex
                 } else {
                     final String signText;
                     if (isStation) {
-                        signText = IGui.mergeStations(selectedIds.stream().filter(ClientData.DATA_CACHE.stationIdMap::containsKey).sorted(Long::compareTo).map(stationId -> IGui.insertTranslation("gui.mtr.station_cjk", "gui.mtr.station", 1, ClientData.DATA_CACHE.stationIdMap.get(stationId).name)).collect(Collectors.toList()));
+                        signText = IGui.mergeStations(selectedIds.stream().filter(KSDClientData.DATA_CACHE.stationIdMap::containsKey).sorted(Long::compareTo).map(stationId -> IGui.insertTranslation("gui.mtr.station_cjk", "gui.mtr.station", 1, KSDClientData.DATA_CACHE.stationIdMap.get(stationId).name)).collect(Collectors.toList()));
                     } else {
                         signText = sign.customText;
                     }
