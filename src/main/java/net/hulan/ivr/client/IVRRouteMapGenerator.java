@@ -517,22 +517,22 @@ public class IVRRouteMapGenerator implements IGui {
                                                         x + drawX + lineWidth * i - lineWidth * interchangeColors.size() / 2,
                                                         y + (textBelow ? -1 : lines * lineSpacing) + (textBelow ? -drawY : drawY),
                                                         -16777216 | interchangeColors.get(i));
-                                                drawResource(
-                                                        nativeImage,
-                                                        "textures/block/sign/train.png",
-                                                        x + drawX + 76 * i - 76 * interchangeColors.size() / 2,
-                                                        y + (textBelow ? -1 : lines * lineSpacing) + (textBelow ? -drawY : drawY) + lineHeight,
-                                                        76,
-                                                        108,
-                                                        true,
-                                                        (float) i / (float) interchangeColors.size(),
-                                                        ((float) i + 1.0F) / (float) interchangeColors.size(),
-                                                        0.0F,
-                                                        1.0F,
-                                                        -16777216 | interchangeColors.get(i),
-                                                        false);
                                             }
                                         }
+                                        drawResource(
+                                                nativeImage,
+                                                "textures/block/sign/train.png",
+                                                x + 76 * i - 76 * interchangeColors.size() / 2,
+                                                y + (textBelow ? 0 : lines * lineSpacing + lineHeight),
+                                                76,
+                                                108,
+                                                true,
+                                                0.0F,
+                                                1.0F,
+                                                0.0F,
+                                                1.0F,
+                                                -16777216 | interchangeColors.get(i),
+                                                false);
                                     }
                                     int[] dimensionsX = new int[2];
                                     byte[] pixelsX = clientCache.getTextPixels(IGui.mergeStations(stationPositionGrouped.interchangeNames), dimensionsX, maxStringWidth - (vertical ? lineHeight : 0), (int) ((float) (fontSizeBig + fontSizeSmall) * 1.25F / 2.0F), fontSizeBig / 2, fontSizeSmall / 2, 0, vertical ? HorizontalAlignment.LEFT : HorizontalAlignment.CENTER);
