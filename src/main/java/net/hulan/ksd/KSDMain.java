@@ -8,7 +8,6 @@ import mtr.item.ItemWithCreativeTabBase;
 import mtr.mappings.FabricRegistryUtilities;
 import mtr.mappings.RegistryUtilities;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.hulan.ksd.data.FirstClassValidationSystem;
 import net.hulan.ksd.data.KSDRailwayData;
@@ -133,11 +132,6 @@ public class KSDMain implements ModInitializer, KSDBlocks, KSDItems, KSDCreative
             the_nether = server.getLevel(Level.NETHER);
             the_end = server.getLevel(Level.END);
         });
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(Commands.literal("test").executes(context -> {
-            ServerPlayer player = context.getSource().getPlayerOrException();
-            KSDPacketServer.openKCRTicketMachineScreenS2C(player, player.blockPosition());
-            return 1;
-        })));
     }
 
     private static void registerItem(String path, RegistryObject<Item> item) {
